@@ -7,7 +7,26 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "api": "documentation build HAPNodeJSClient.js lib/hapRequest.js lib/eventedHttpClient.js lib/httpParser.js -f md --config docs/documentation.yml > docs/API.md",
+    "document": "./gh-md-toc --insert README.md"
+  },
+  "devDependencies": {
+    "ava": "0.25.0",
+    "coveralls": "3.0.2",
+    "documentation": "8.1.2",
+    "nyc": "13.1.0",
+    "xo": "0.23.0"
+  },
+  "dependencies": {
+    "bonjour": ">=3.5.0",
+    "debug": ">2.6.9",
+    "ip": ">=1.1.5",
+    "once": ">=1.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NorthernMan54/hap-node-client.git"
   },
   "author": "NorthernMan54",
   "license": "ISC"

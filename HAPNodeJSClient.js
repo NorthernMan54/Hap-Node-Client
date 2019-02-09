@@ -29,6 +29,18 @@ hapEvent - Emitted when an HAP EVENT message is revieved
 
 */
 
+/**
+ * Homebridge plugin to allow control via Alexa devices
+ * @param {String} options.pin - Homebridge
+ * @param {String} options.refreh - Discovery refresh interval in seconds
+ * @example
+ * options sample
+ * {
+ *   "pin": "031-45-154",
+ *   "refresh": 900
+ * }
+ */
+
 function HAPNodeJSClient(options) {
   this.pin = options.pin;
   _discovery.call(this);
