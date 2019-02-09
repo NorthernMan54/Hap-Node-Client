@@ -13,14 +13,18 @@ Homebridge plugin to allow control via Alexa devices
 ### Parameters
 
 -   `options`  
+-   `pin` **[String][4]** Homebridge PIN
+-   `refreh` **[String][4]** Discovery refresh interval in seconds
+-   `debug` **[String][4]** Enable DEBUG module
 
 ### Examples
 
 ```javascript
-options sample
+sample
 {
   "pin": "031-45-154",
-  "refresh": 900
+  "refresh": 900,
+  "debug": true
 }
 ```
 
@@ -29,3 +33,5 @@ options sample
 [2]: #parameters
 
 [3]: #examples
+
+[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String

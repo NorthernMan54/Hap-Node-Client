@@ -22,7 +22,9 @@
     "bonjour": ">=3.5.0",
     "debug": ">2.6.9",
     "ip": ">=1.1.5",
-    "once": ">=1.4.0"
+    "once": ">=1.4.0",
+    "extend": ">=3.0.2",
+    "buffer": "^4.9.1"
   },
   "repository": {
     "type": "git",

@@ -3,7 +3,7 @@
 var request = require('./lib/hapRequest.js');
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('util').inherits;
-var debug = require('debug')('HAPClient');
+var debug = require('debug')('hapClient');
 var bonjour = require('bonjour')();
 var ip = require('ip');
 
@@ -31,17 +31,34 @@ hapEvent - Emitted when an HAP EVENT message is revieved
 
 /**
  * Homebridge plugin to allow control via Alexa devices
- * @param {String} options.pin - Homebridge
- * @param {String} options.refreh - Discovery refresh interval in seconds
+ * @param {String} pin - Homebridge PIN
+ * @param {String} refreh - Discovery refresh interval in seconds
+ * @param {String} debug - Enable DEBUG module
  * @example
- * options sample
+ * sample
  * {
  *   "pin": "031-45-154",
- *   "refresh": 900
+ *   "refresh": 900,
+ *   "debug": true
  * }
  */
 
 function HAPNodeJSClient(options) {
+  // console.log("Options", options);
+  this.debug = options['debug'] || false;
+  if (this.debug) {
+    let debugEnable = require('debug');
+    let namespaces = debugEnable.disable();
+
+    // this.log("DEBUG-1", namespaces);
+    if (namespaces) {
+      namespaces = namespaces + ',hap*';
+    } else {
+      namespaces = 'hap*';
+    }
+    // this.log("DEBUG-2", namespaces);
+    debugEnable.enable(namespaces);
+  }
   this.pin = options.pin;
   _discovery.call(this);
   this._eventBus = new EventEmitter();
