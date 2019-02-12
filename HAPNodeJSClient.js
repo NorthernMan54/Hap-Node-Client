@@ -65,8 +65,9 @@ function HAPNodeJSClient(options) {
   setInterval(_discovery.bind(this), options.refresh * 1000);
 
   this._eventBus.on('Event', function(event) {
-    // debug('Event', this, event);
+    debug('Event', event);
     this.emit('hapEvent', event);
+    this.emit(event.host + event.port + event.aid + event.iid, event);
   }.bind(this));
   // debug("This", this);
 }
