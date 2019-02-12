@@ -231,7 +231,7 @@ function _getAccessories(ipAddress, instance, callback) {
       } else {
         // Status code = 401 = homebridge not running in insecure mode
         if (response.statusCode === 401) {
-          debug("HAP Discover failed %s http://%s:%s homebridge is not running in insecure mode with -I", instance.txt.md, ipAddress, instance.port);
+          debug("HAP Discover failed %s http://%s:%s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, ipAddress, instance.port, body);
           err = new Error("homebridge is not running in insecure mode with -I", response.statusCode);
         } else {
           debug("HAP Discover failed %s http://%s:%s error code %s", instance.txt.md, ipAddress, instance.port, response.statusCode);
