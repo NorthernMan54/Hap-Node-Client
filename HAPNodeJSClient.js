@@ -91,10 +91,10 @@ function _discovery() {
         }
       }
 
-      debug("HAP instance address: %s -> %s -> %s", instance.txt.md, instance.host, ipAddress);
+      debug("HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
       _getAccessories.call(this, ipAddress, instance, function(err, data) {
         if (!err) {
-          debug("Homebridge instance discovered %s with %s accessories", instance.name, Object.keys(data.accessories.accessories).length, this);
+          debug("Homebridge instance discovered %s with %s accessories", instance.name, Object.keys(data.accessories.accessories).length);
           if (Object.keys(data.accessories.accessories).length > 0) {
             discovered.push(data);
           }
@@ -160,6 +160,48 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
       } catch (ex) {
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
+
+        callback(new Error(ex));
+      }
+      callback(null, rsp);
+    }
+  });
+};
+
+HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback) {
+  request({
+    eventBus: this._eventBus,
+    method: 'POST',
+    url: 'http://' + ipAddress + ':' + port + '/resource',
+    timeout: 7000,
+    maxAttempts: 1, // (default) try 5 times
+    headers: {
+      "Content-Type": "Application/json",
+      "authorization": this.pin,
+      "connection": "keep-alive"
+    },
+    body: body
+  }, function(err, response) {
+    // Response s/b 200 OK
+
+    if (err) {
+      //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
+      callback(err);
+    } else if (response.statusCode !== 200) {
+      if (response.statusCode === 401) {
+        debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err);
+        callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+      } else {
+        debug("Homebridge Status failed %s:%s Status: %s ", ipAddress, port, response.statusCode, body, err);
+        callback(new Error("Homebridge status failed"));
+      }
+    } else {
+      var rsp;
+      try {
+        rsp = response.body;
+      } catch (ex) {
+        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
+        debug("Homebridge Response Failed %s:%s", ipAddress, port, ex);
 
         callback(new Error(ex));
       }
