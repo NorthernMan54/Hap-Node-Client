@@ -30,17 +30,10 @@ hapEvent - Emitted when an HAP EVENT message is revieved
 */
 
 /**
- * Homebridge plugin to allow control via Alexa devices
- * @param {String} pin - Homebridge PIN
- * @param {String} refreh - Discovery refresh interval in seconds
- * @param {String} debug - Enable DEBUG module
- * @example
- * sample
- * {
- *   "pin": "031-45-154",
- *   "refresh": 900,
- *   "debug": true
- * }
+ * HAPNodeJSClient - description
+ *
+ * @param  {type} options description
+ * @return {type}         description
  */
 
 function HAPNodeJSClient(options) {
@@ -117,6 +110,13 @@ function _discoveryEnd() {
   this.browser.stop();
 }
 
+/**
+ * HAPNodeJSClient.prototype.HAPaccessories - description
+ *
+ * @param  {type} callback description
+ * @return {type}          description
+ */
+
 HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
   // This is a callback as in the future may need to call something
   callback(discovered);
@@ -124,6 +124,16 @@ HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
 
 // curl -X PUT http://127.0.0.1:51826/characteristics --header "Content-Type:Application/json"
 // --header "authorization: 031-45-154" --data "{ \"characteristics\": [{ \"aid\": 2, \"iid\": 9, \"value\": 0}] }"
+
+/**
+ * HAPNodeJSClient.prototype.HAPcontrol - description
+ *
+ * @param  {type} ipAddress description
+ * @param  {type} port      description
+ * @param  {type} body      description
+ * @param  {type} callback  description
+ * @return {type}           description
+ */
 
 HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback) {
   request({
@@ -168,6 +178,16 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
   });
 };
 
+/**
+ * HAPNodeJSClient.prototype.HAPresource - description
+ *
+ * @param  {type} ipAddress description
+ * @param  {type} port      description
+ * @param  {type} body      description
+ * @param  {type} callback  description
+ * @return {type}           description
+ */
+
 HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback) {
   request({
     eventBus: this._eventBus,
@@ -210,6 +230,16 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
   });
 };
 
+/**
+ * HAPNodeJSClient.prototype.HAPstatus - description
+ *
+ * @param  {type} ipAddress description
+ * @param  {type} port      description
+ * @param  {type} body      description
+ * @param  {type} callback  description
+ * @return {type}           description
+ */
+
 HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
   request({
     eventBus: this._eventBus,
@@ -224,7 +254,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
     }
   }, function(err, response) {
     // Response s/b 200 OK
-
+    // debug("HAPstatus", 'http://' + ipAddress + ':' + port + '/characteristics' + body);
     if (err) {
       //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
       callback(err);
