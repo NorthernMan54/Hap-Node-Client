@@ -4,34 +4,107 @@
 
 -   [HAPNodeJSClient][1]
     -   [Parameters][2]
-    -   [Examples][3]
+    -   [HAPaccessories][3]
+        -   [Parameters][4]
+    -   [HAPcontrol][5]
+        -   [Parameters][6]
+    -   [HAPresource][7]
+        -   [Parameters][8]
+    -   [HAPstatus][9]
+        -   [Parameters][10]
+-   [q][11]
+    -   [Parameters][12]
 
 ## HAPNodeJSClient
 
-Homebridge plugin to allow control via Alexa devices
+HAPNodeJSClient - description
 
 ### Parameters
 
--   `options`  
--   `pin` **[String][4]** Homebridge PIN
--   `refreh` **[String][4]** Discovery refresh interval in seconds
--   `debug` **[String][4]** Enable DEBUG module
+-   `options` **type** description
 
-### Examples
+Returns **type** description
 
-```javascript
-sample
-{
-  "pin": "031-45-154",
-  "refresh": 900,
-  "debug": true
-}
-```
+### HAPaccessories
+
+HAPNodeJSClient.prototype.HAPaccessories - description
+
+#### Parameters
+
+-   `callback` **type** description
+
+Returns **type** description
+
+### HAPcontrol
+
+HAPNodeJSClient.prototype.HAPcontrol - description
+
+#### Parameters
+
+-   `ipAddress` **type** description
+-   `port` **type** description
+-   `body` **type** description
+-   `callback` **type** description
+
+Returns **type** description
+
+### HAPresource
+
+HAPNodeJSClient.prototype.HAPresource - description
+
+#### Parameters
+
+-   `ipAddress` **type** description
+-   `port` **type** description
+-   `body` **type** description
+-   `callback` **type** description
+
+Returns **type** description
+
+### HAPstatus
+
+HAPNodeJSClient.prototype.HAPstatus - description
+
+#### Parameters
+
+-   `ipAddress` **type** description
+-   `port` **type** description
+-   `body` **type** description
+-   `callback` **type** description
+
+Returns **type** description
+
+## q
+
+var q - Message queuing to prevent requests overstepping each other
+
+### Parameters
+
+-   `function` **type** (request description
+-   `cb` **type** description
+
+Returns **type** description
 
 [1]: #hapnodejsclient
 
 [2]: #parameters
 
-[3]: #examples
+[3]: #hapaccessories
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[4]: #parameters-1
+
+[5]: #hapcontrol
+
+[6]: #parameters-2
+
+[7]: #hapresource
+
+[8]: #parameters-3
+
+[9]: #hapstatus
+
+[10]: #parameters-4
+
+[11]: #q
+
+[12]: #parameters-5
