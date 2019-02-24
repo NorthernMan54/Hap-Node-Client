@@ -3,7 +3,7 @@
 var request = require('./lib/hapRequest.js');
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('util').inherits;
-var debug = require('debug')('hapClient');
+var debug = require('debug')('hapNodeJSClient');
 var bonjour = require('bonjour')();
 var ip = require('ip');
 
@@ -282,7 +282,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
 };
 
 function _getAccessories(ipAddress, instance, callback) {
-  // debug("_getAccessories", this);
+  // debug("_getAccessories", 'http://' + ipAddress + ':' + instance.port + '/accessories');
   request({
     eventBus: this._eventBus,
     method: 'GET',
@@ -296,15 +296,16 @@ function _getAccessories(ipAddress, instance, callback) {
       "authorization": this.pin,
       "connection": "keep-alive"
     }
-  }, function(err, response, body) {
+  }, function(err, response) {
     // Response s/b 200 OK
+    // debug("_getAccessories", response);
     if (err || response.statusCode !== 200) {
       if (err) {
         debug("HAP Discover failed %s http://%s:%s error %s", instance.txt.md, ipAddress, instance.port, err.code);
       } else {
         // Status code = 401 = homebridge not running in insecure mode
         if (response.statusCode === 401) {
-          debug("HAP Discover failed %s http://%s:%s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, ipAddress, instance.port, body);
+          debug("HAP Discover failed %s http://%s:%s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, ipAddress, instance.port, response);
           err = new Error("homebridge is not running in insecure mode with -I", response.statusCode);
         } else {
           debug("HAP Discover failed %s http://%s:%s error code %s", instance.txt.md, ipAddress, instance.port, response.statusCode);
@@ -315,15 +316,15 @@ function _getAccessories(ipAddress, instance, callback) {
       callback(err);
     } else {
       // debug("RESPONSE", response, body);
-      if (body && Object.keys(body.accessories).length > 0) {
+      if (response.body && Object.keys(response.body.accessories).length > 0) {
         callback(null, {
           "ipAddress": ipAddress,
           "instance": instance,
-          "accessories": body
+          "accessories": response.body
         });
       } else {
-        debug("Short json data received http://%s:%s", ipAddress, instance.port, JSON.stringify(body));
-        callback(new Error("Short json data receivedh http://%s:%s", ipAddress, instance.port));
+        debug("Short json data received http://%s:%s", ipAddress, instance.port, JSON.stringify(response));
+        callback(new Error("Short json data received http://%s:%s", ipAddress, instance.port));
       }
     }
   });
