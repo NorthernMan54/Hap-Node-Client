@@ -97,7 +97,7 @@ function _discovery() {
       });
     }.bind(this));
 
-    setTimeout(_discoveryEnd.bind(this), 10 * 1000); // End discover after 55 seconds
+    setTimeout(_discoveryEnd.bind(this), 20 * 1000); // End discover after 55 seconds
   } catch (ex) {
     handleError(ex);
   }
