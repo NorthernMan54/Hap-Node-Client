@@ -3,6 +3,7 @@
 if npm audit; then
   rm *orig* *toc\.*
   npm run-script document
+  npm run-script api
   git add .
   git commit -m "$1"
   npm version patch -m "$1"

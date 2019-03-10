@@ -8,26 +8,31 @@
         -   [Parameters][4]
     -   [HAPcontrol][5]
         -   [Parameters][6]
-    -   [HAPresource][7]
+    -   [HAPevent][7]
         -   [Parameters][8]
-    -   [HAPstatus][9]
+    -   [HAPresource][9]
         -   [Parameters][10]
--   [q][11]
-    -   [Parameters][12]
+    -   [HAPstatus][11]
+        -   [Parameters][12]
+-   [HAPNodeJSClient#hapEvent][13]
+    -   [Properties][14]
+    -   [Examples][15]
+-   [Request][16]
+    -   [Parameters][17]
 
 ## HAPNodeJSClient
 
-HAPNodeJSClient - description
+HAPNodeJSClient - Client for Homebridge and HAP-NodeJS in insecure mode.
+
+Events
 
 ### Parameters
 
 -   `options` **type** description
 
-Returns **type** description
-
 ### HAPaccessories
 
-HAPNodeJSClient.prototype.HAPaccessories - description
+HAPNodeJSClient.prototype.HAPaccessories - Returns an array of all homebridge instances, and the accessories for each.
 
 #### Parameters
 
@@ -37,49 +42,74 @@ Returns **type** description
 
 ### HAPcontrol
 
-HAPNodeJSClient.prototype.HAPcontrol - description
+HAPNodeJSClient.prototype.HAPcontrol - Send a characteristic PUT Message to a particular homebridge instance
 
 #### Parameters
 
--   `ipAddress` **type** description
--   `port` **type** description
--   `body` **type** description
--   `callback` **type** description
+-   `ipAddress` **type** IP Address of homebridge instance
+-   `port` **type** Port of homebridge instance
+-   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+-   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
 
-Returns **type** description
+### HAPevent
+
+HAPNodeJSClient.prototype.HAPevent - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
+
+#### Parameters
+
+-   `ipAddress` **type** IP Address of homebridge instance
+-   `port` **type** Port of homebridge instance
+-   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+-   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
 
 ### HAPresource
 
-HAPNodeJSClient.prototype.HAPresource - description
+HAPNodeJSClient.prototype.HAPresource - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
 
 #### Parameters
 
--   `ipAddress` **type** description
--   `port` **type** description
--   `body` **type** description
--   `callback` **type** description
-
-Returns **type** description
+-   `ipAddress` **type** IP Address of homebridge instance
+-   `port` **type** Port of homebridge instance
+-   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+-   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
 
 ### HAPstatus
 
-HAPNodeJSClient.prototype.HAPstatus - description
+HAPNodeJSClient.prototype.HAPstatus - Get current status for characteristics
 
 #### Parameters
 
--   `ipAddress` **type** description
--   `port` **type** description
+-   `ipAddress` **type** IP Address of homebridge instance
+-   `port` **type** Port of homebridge instance
 -   `body` **type** description
--   `callback` **type** description
+-   `callback` **type** Callback to execute upon completion of characteristic getting, function(err, response)
 
-Returns **type** description
+## HAPNodeJSClient#hapEvent
 
-## q
+HomeKit Accessory Characteristic event pass thru
+
+### Properties
+
+-   `host` **[string][18]** IP Address of homebridge instance generating event
+-   `port` **[number][19]** Port of homebridge instance generating event
+-   `aid` **[number][19]** Accessory ID of accessory generating event
+-   `iid` **[number][19]** Instance ID of accessory characteristic generating event
+
+### Examples
+
+```javascript
+Sample Message
+
+{ host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
+```
+
+## Request
 
 var q - Message queuing to prevent requests overstepping each other
 
 ### Parameters
 
+-   `options`  
 -   `function` **type** (request description
 -   `cb` **type** description
 
@@ -97,14 +127,28 @@ Returns **type** description
 
 [6]: #parameters-2
 
-[7]: #hapresource
+[7]: #hapevent
 
 [8]: #parameters-3
 
-[9]: #hapstatus
+[9]: #hapresource
 
 [10]: #parameters-4
 
-[11]: #q
+[11]: #hapstatus
 
 [12]: #parameters-5
+
+[13]: #hapnodejsclienthapevent
+
+[14]: #properties
+
+[15]: #examples
+
+[16]: #request
+
+[17]: #parameters-6
+
+[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
