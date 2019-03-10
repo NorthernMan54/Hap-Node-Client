@@ -25,7 +25,8 @@
     "once": ">=1.4.0",
     "extend": ">=3.0.2",
     "buffer": "^4.9.1",
-    "better-queue": ">=3.8.10"
+    "better-queue": ">=3.8.10",
+    "requestretry": "^=1.13.0"
   },
   "repository": {
     "type": "git",

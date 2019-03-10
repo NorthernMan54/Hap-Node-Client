@@ -1,6 +1,8 @@
 "use strict";
 
-var request = require('./lib/hapRequest.js');
+var request = require('requestretry');
+// var request = require('./lib/hapRequest.js');
+var hapRequest = require('./lib/hapRequest.js');
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('util').inherits;
 var debug = require('debug')('hapNodeJSClient');
@@ -13,27 +15,15 @@ module.exports = {
   HAPNodeJSClient: HAPNodeJSClient
 };
 
-/*
-
-HAPaccessories
-
-HAPcontrol
-
-HAPstatus
-
-External events
-
-Ready - Emitted after every discovery cycle
-
-hapEvent - Emitted when an HAP EVENT message is revieved
-
-*/
-
 /**
- * HAPNodeJSClient - description
+ * HAPNodeJSClient - Client for Homebridge and HAP-NodeJS in insecure mode.
  *
+ * Events
+ *
+ * @class
  * @param  {type} options description
- * @return {type}         description
+ * @example
+ *
  */
 
 function HAPNodeJSClient(options) {
@@ -59,6 +49,20 @@ function HAPNodeJSClient(options) {
 
   this._eventBus.on('Event', function(event) {
     debug('Event', event);
+    /**
+     * HomeKit Accessory Characteristic event pass thru
+     *
+     * @event HAPNodeJSClient#hapEvent
+     * @Type  {object}
+     * @property {string} host - IP Address of homebridge instance generating event
+     * @property {number} port - Port of homebridge instance generating event
+     * @property {number} aid - Accessory ID of accessory generating event
+     * @property {number} iid - Instance ID of accessory characteristic generating event
+     * @property {???} status - Updated characteristic value
+     * @example Sample Message
+     *
+     * { host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
+     */
     this.emit('hapEvent', event);
     this.emit(event.host + event.port + event.aid + event.iid, event);
   }.bind(this));
@@ -111,7 +115,7 @@ function _discoveryEnd() {
 }
 
 /**
- * HAPNodeJSClient.prototype.HAPaccessories - description
+ * HAPNodeJSClient.prototype.HAPaccessories - Returns an array of all homebridge instances, and the accessories for each.
  *
  * @param  {type} callback description
  * @return {type}          description
@@ -126,13 +130,12 @@ HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
 // --header "authorization: 031-45-154" --data "{ \"characteristics\": [{ \"aid\": 2, \"iid\": 9, \"value\": 0}] }"
 
 /**
- * HAPNodeJSClient.prototype.HAPcontrol - description
+ * HAPNodeJSClient.prototype.HAPcontrol - Send a characteristic PUT Message to a particular homebridge instance
  *
- * @param  {type} ipAddress description
- * @param  {type} port      description
- * @param  {type} body      description
- * @param  {type} callback  description
- * @return {type}           description
+ * @param  {type} ipAddress IP Address of homebridge instance
+ * @param  {type} port      Port of homebridge instance
+ * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+ * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
 HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback) {
@@ -179,13 +182,64 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
 };
 
 /**
- * HAPNodeJSClient.prototype.HAPresource - description
+ * HAPNodeJSClient.prototype.HAPevent - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
  *
- * @param  {type} ipAddress description
- * @param  {type} port      description
- * @param  {type} body      description
- * @param  {type} callback  description
- * @return {type}           description
+ * @param  {type} ipAddress IP Address of homebridge instance
+ * @param  {type} port      Port of homebridge instance
+ * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+ * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
+ */
+
+HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
+  hapRequest({
+    eventBus: this._eventBus,
+    method: 'PUT',
+    url: 'http://' + ipAddress + ':' + port + '/characteristics',
+    timeout: 7000,
+    maxAttempts: 1, // (default) try 5 times
+    headers: {
+      "Content-Type": "Application/json",
+      "authorization": this.pin,
+      "connection": "keep-alive"
+    },
+    body: body
+  }, function(err, response) {
+    // Response s/b 200 OK
+
+    if (err) {
+      debug("Homebridge event reg failed %s:%s", ipAddress, port, body, err);
+      callback(err);
+    } else if (response.statusCode !== 207) {
+      if (response.statusCode === 401) {
+        debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
+        callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+      } else {
+        debug("Homebridge event reg failed %s:%s Status: %s ", ipAddress, port, response.statusCode, body, err, response.body);
+        callback(new Error("Homebridge event reg failed"));
+      }
+    } else {
+      var rsp;
+
+      try {
+        rsp = response.body;
+      } catch (ex) {
+        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
+        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
+
+        callback(new Error(ex));
+      }
+      callback(null, rsp);
+    }
+  });
+};
+
+/**
+ * HAPNodeJSClient.prototype.HAPresource - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
+ *
+ * @param  {type} ipAddress IP Address of homebridge instance
+ * @param  {type} port      Port of homebridge instance
+ * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+ * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
 HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback) {
@@ -231,13 +285,12 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
 };
 
 /**
- * HAPNodeJSClient.prototype.HAPstatus - description
+ * HAPNodeJSClient.prototype.HAPstatus - Get current status for characteristics
  *
- * @param  {type} ipAddress description
- * @param  {type} port      description
+ * @param  {type} ipAddress IP Address of homebridge instance
+ * @param  {type} port      Port of homebridge instance
  * @param  {type} body      description
- * @param  {type} callback  description
- * @return {type}           description
+ * @param  {type} callback  Callback to execute upon completion of characteristic getting, function(err, response)
  */
 
 HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
@@ -269,13 +322,14 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
     } else {
       var rsp;
       try {
-        rsp = response.body;
+        rsp = JSON.parse(response.body);
       } catch (ex) {
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
 
         callback(new Error(ex));
       }
+      // debug("HAPStatus callback", rsp);
       callback(null, rsp);
     }
   });
@@ -315,12 +369,12 @@ function _getAccessories(ipAddress, instance, callback) {
       }
       callback(err);
     } else {
-      // debug("RESPONSE", response, body);
-      if (response.body && Object.keys(response.body.accessories).length > 0) {
+      var message = JSON.parse(response.body);
+      if (message && Object.keys(message.accessories).length > 0) {
         callback(null, {
           "ipAddress": ipAddress,
           "instance": instance,
-          "accessories": response.body
+          "accessories": message
         });
       } else {
         debug("Short json data received http://%s:%s", ipAddress, instance.port, JSON.stringify(response));
