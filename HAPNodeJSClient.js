@@ -117,6 +117,7 @@ function _discoveryEnd() {
 /**
  * HAPNodeJSClient.prototype.HAPaccessories - Returns an array of all homebridge instances, and the accessories for each.
  *
+ * @class
  * @param  {type} callback description
  * @return {type}          description
  */
@@ -342,7 +343,6 @@ function _getAccessories(ipAddress, instance, callback) {
     method: 'GET',
     url: 'http://' + ipAddress + ':' + instance.port + '/accessories',
     timeout: 7000,
-    json: true,
     maxAttempts: 5, // (default) try 5 times
     retryDelay: 5000, // (default) wait for 5s before trying again
     headers: {
@@ -369,6 +369,7 @@ function _getAccessories(ipAddress, instance, callback) {
       }
       callback(err);
     } else {
+      // debug("_getAccessories", response.body);
       var message = JSON.parse(response.body);
       if (message && Object.keys(message.accessories).length > 0) {
         callback(null, {
