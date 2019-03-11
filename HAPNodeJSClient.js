@@ -168,9 +168,8 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
       }
     } else {
       var rsp;
-
       try {
-        rsp = response.body;
+        rsp = JSON.parse(response.body);
       } catch (ex) {
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
@@ -222,7 +221,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
       var rsp;
 
       try {
-        rsp = response.body;
+        rsp = JSON.parse(response.body);
       } catch (ex) {
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
@@ -273,7 +272,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     } else {
       var rsp;
       try {
-        rsp = response.body;
+        rsp = JSON.parse(response.body);
       } catch (ex) {
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
         debug("Homebridge Response Failed %s:%s", ipAddress, port, ex);
