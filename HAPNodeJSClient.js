@@ -22,6 +22,11 @@ module.exports = {
  *
  * @class
  * @param  {type} options description
+ * @Type  {object}
+ * @property {boolean} debug - Enable debug logging, defaults to false
+ * @property {string} pin - Homebridge PIN, defaults to '031-45-154'
+ * @property {number} refresh - Discovery refresh, defaults to 15 minutes
+ * @property {number} timeout - Discovery timeout, defaults to 20 seconds
  * @example
  *
  */
@@ -29,6 +34,9 @@ module.exports = {
 function HAPNodeJSClient(options) {
   // console.log("Options", options);
   this.debug = options['debug'] || false;
+  this.refresh = options['refresh'] || 900;
+  this.timeout = options['timeout'] || 20;
+  this.pin = options['pin'] || '031-45-154';
   if (this.debug) {
     let debugEnable = require('debug');
     let namespaces = debugEnable.disable();
@@ -42,10 +50,9 @@ function HAPNodeJSClient(options) {
     // this.log("DEBUG-2", namespaces);
     debugEnable.enable(namespaces);
   }
-  this.pin = options.pin;
   _discovery.call(this);
   this._eventBus = new EventEmitter();
-  setInterval(_discovery.bind(this), options.refresh * 1000);
+  setInterval(_discovery.bind(this), this.refresh * 1000);
 
   this._eventBus.on('Event', function(event) {
     debug('Event', event);
@@ -58,7 +65,7 @@ function HAPNodeJSClient(options) {
      * @property {number} port - Port of homebridge instance generating event
      * @property {number} aid - Accessory ID of accessory generating event
      * @property {number} iid - Instance ID of accessory characteristic generating event
-     * @property {???} status - Updated characteristic value
+     * @property {object} status - Updated characteristic value
      * @example Sample Message
      *
      * { host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
@@ -101,7 +108,7 @@ function _discovery() {
       });
     }.bind(this));
 
-    setTimeout(_discoveryEnd.bind(this), 20 * 1000); // End discover after 55 seconds
+    setTimeout(_discoveryEnd.bind(this), this.timeout * 1000); // End discover after 'timeout' seconds
   } catch (ex) {
     handleError(ex);
   }

@@ -4,21 +4,22 @@
 
 -   [HAPNodeJSClient][1]
     -   [Parameters][2]
-    -   [HAPaccessories][3]
-        -   [Parameters][4]
-    -   [HAPcontrol][5]
-        -   [Parameters][6]
-    -   [HAPevent][7]
-        -   [Parameters][8]
-    -   [HAPresource][9]
-        -   [Parameters][10]
-    -   [HAPstatus][11]
-        -   [Parameters][12]
--   [HAPNodeJSClient#hapEvent][13]
-    -   [Properties][14]
-    -   [Examples][15]
--   [Request][16]
-    -   [Parameters][17]
+    -   [Properties][3]
+    -   [HAPaccessories][4]
+        -   [Parameters][5]
+    -   [HAPcontrol][6]
+        -   [Parameters][7]
+    -   [HAPevent][8]
+        -   [Parameters][9]
+    -   [HAPresource][10]
+        -   [Parameters][11]
+    -   [HAPstatus][12]
+        -   [Parameters][13]
+-   [HAPNodeJSClient#hapEvent][14]
+    -   [Properties][15]
+    -   [Examples][16]
+-   [Request][17]
+    -   [Parameters][18]
 
 ## HAPNodeJSClient
 
@@ -29,6 +30,13 @@ Events
 ### Parameters
 
 -   `options` **type** description
+
+### Properties
+
+-   `debug` **[boolean][19]** Enable debug logging, defaults to false
+-   `pin` **[string][20]** Homebridge PIN, defaults to '031-45-154'
+-   `refresh` **[number][21]** Discovery refresh, defaults to 15 minutes
+-   `timeout` **[number][21]** Discovery timeout, defaults to 20 seconds
 
 ### HAPaccessories
 
@@ -90,10 +98,11 @@ HomeKit Accessory Characteristic event pass thru
 
 ### Properties
 
--   `host` **[string][18]** IP Address of homebridge instance generating event
--   `port` **[number][19]** Port of homebridge instance generating event
--   `aid` **[number][19]** Accessory ID of accessory generating event
--   `iid` **[number][19]** Instance ID of accessory characteristic generating event
+-   `host` **[string][20]** IP Address of homebridge instance generating event
+-   `port` **[number][21]** Port of homebridge instance generating event
+-   `aid` **[number][21]** Accessory ID of accessory generating event
+-   `iid` **[number][21]** Instance ID of accessory characteristic generating event
+-   `status` **[object][22]** Updated characteristic value
 
 ### Examples
 
@@ -119,36 +128,42 @@ Returns **type** description
 
 [2]: #parameters
 
-[3]: #hapaccessories
+[3]: #properties
 
-[4]: #parameters-1
+[4]: #hapaccessories
 
-[5]: #hapcontrol
+[5]: #parameters-1
 
-[6]: #parameters-2
+[6]: #hapcontrol
 
-[7]: #hapevent
+[7]: #parameters-2
 
-[8]: #parameters-3
+[8]: #hapevent
 
-[9]: #hapresource
+[9]: #parameters-3
 
-[10]: #parameters-4
+[10]: #hapresource
 
-[11]: #hapstatus
+[11]: #parameters-4
 
-[12]: #parameters-5
+[12]: #hapstatus
 
-[13]: #hapnodejsclienthapevent
+[13]: #parameters-5
 
-[14]: #properties
+[14]: #hapnodejsclienthapevent
 
-[15]: #examples
+[15]: #properties-1
 
-[16]: #request
+[16]: #examples
 
-[17]: #parameters-6
+[17]: #request
 
-[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[18]: #parameters-6
 
-[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[21]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[22]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
