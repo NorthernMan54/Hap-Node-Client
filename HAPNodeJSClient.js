@@ -71,6 +71,7 @@ function HAPNodeJSClient(options) {
      * { host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
      */
     this.emit('hapEvent', event);
+    this.emit(event.host + event.port + event.aid, event);
     this.emit(event.host + event.port + event.aid + event.iid, event);
   }.bind(this));
   // debug("This", this);
