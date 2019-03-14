@@ -65,7 +65,7 @@ function HAPNodeJSClient(options) {
      * @property {number} port - Port of homebridge instance generating event
      * @property {number} aid - Accessory ID of accessory generating event
      * @property {number} iid - Instance ID of accessory characteristic generating event
-     * @property {object} status - Updated characteristic value
+     * @property {object} value - Updated characteristic value
      * @example Sample Message
      *
      * { host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
