@@ -55,7 +55,7 @@ function HAPNodeJSClient(options) {
   setInterval(_discovery.bind(this), this.refresh * 1000);
 
   this._eventBus.on('Event', function(events) {
-    debug('Events', events);
+    debug('Events', JSON.stringify(events));
     /**
      * HomeKit Accessory Characteristic event pass thru
      *
@@ -283,7 +283,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     } else {
       var rsp;
       try {
-        rsp = JSON.parse(response.body);
+        rsp = response.body;
       } catch (ex) {
         debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
         debug("Homebridge Response Failed %s:%s", ipAddress, port, ex);
