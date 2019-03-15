@@ -54,8 +54,8 @@ function HAPNodeJSClient(options) {
   this._eventBus = new EventEmitter();
   setInterval(_discovery.bind(this), this.refresh * 1000);
 
-  this._eventBus.on('Event', function(event) {
-    debug('Event', event);
+  this._eventBus.on('Event', function(events) {
+    debug('Events', events);
     /**
      * HomeKit Accessory Characteristic event pass thru
      *
@@ -70,9 +70,12 @@ function HAPNodeJSClient(options) {
      *
      * { host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
      */
-    this.emit('hapEvent', event);
-    this.emit(event.host + event.port + event.aid, event);
-    this.emit(event.host + event.port + event.aid + event.iid, event);
+    this.emit('hapEvent', events);
+    this.emit(events[0].host + events[0].port + events[0].aid, events);
+    events.forEach(function(event) {
+      // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
+      this.emit(event.host + event.port + event.aid + event.iid, event);
+    }.bind(this));
   }.bind(this));
   // debug("This", this);
 }
