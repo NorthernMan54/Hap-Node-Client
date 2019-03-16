@@ -167,7 +167,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
     // Response s/b 200 OK
 
     if (err) {
-      debug("Homebridge Control failed %s:%s", ipAddress, port, body, err);
+      debug("Homebridge Control failed %s:%s", ipAddress, port, body, err.message);
       callback(err);
     } else if (response.statusCode !== 207) {
       if (response.statusCode === 401) {
@@ -218,7 +218,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
     // Response s/b 200 OK
 
     if (err) {
-      debug("Homebridge event reg failed %s:%s", ipAddress, port, body, err);
+      debug("Homebridge event reg failed %s:%s", ipAddress, port, body, err.message);
       callback(err);
     } else if (response.statusCode !== 207) {
       if (response.statusCode === 401) {
