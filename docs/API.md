@@ -102,7 +102,7 @@ HomeKit Accessory Characteristic event pass thru
 -   `port` **[number][21]** Port of homebridge instance generating event
 -   `aid` **[number][21]** Accessory ID of accessory generating event
 -   `iid` **[number][21]** Instance ID of accessory characteristic generating event
--   `status` **[object][22]** Updated characteristic value
+-   `value` **[object][22]** Updated characteristic value
 
 ### Examples
 
