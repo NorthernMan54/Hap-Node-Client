@@ -50,9 +50,23 @@ function HAPNodeJSClient(options) {
     // this.log("DEBUG-2", namespaces);
     debugEnable.enable(namespaces);
   }
+  this.eventRegistry = [];
   _discovery.call(this);
   this._eventBus = new EventEmitter();
   setInterval(_discovery.bind(this), this.refresh * 1000);
+
+  /**
+   * HomeKit Accessory Characteristic event pass thru
+   *
+   * @event HAPNodeJSClient#Disconnected
+   * @Type  {object}
+   * @property {string} server - IP Address and port of disconnected homebridge
+   * @example Sample Message
+   *
+   * { host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
+   */
+
+  this._eventBus.on('Disconnected', _reconnectServer.bind(this));
 
   this._eventBus.on('Event', function(events) {
     debug('Events', JSON.stringify(events));
@@ -193,6 +207,32 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
 };
 
 /**
+ * _reconnectServer - Reconnect to event server
+ *
+ * @param  {type} server IP Address and port of disconnected homebridge server
+ * @return {type}        description
+ */
+
+function _reconnectServer(server) {
+  debug("HAPevent events Reregister", server, JSON.stringify(this.eventRegistry[server]));
+
+  var reconnectTimer = setInterval(function() {
+    this.HAPevent(server.split(':')[0], server.split(':')[1], JSON.stringify({
+      characteristics: this.eventRegistry[server]
+    }), clearTimer);
+  }.bind(this), 60000);
+
+  function clearTimer(err, rsp) {
+    if (err) {
+      debug("HAPevent event reregister failed, retry in 60", server, err);
+    } else {
+      debug("HAPevent event reregister succedded", server);
+      clearInterval(reconnectTimer);
+    }
+  }
+}
+
+/**
  * HAPNodeJSClient.prototype.HAPevent - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
  *
  * @param  {type} ipAddress IP Address of homebridge instance
@@ -231,6 +271,13 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
     } else {
       var rsp;
 
+      var key = ipAddress + ':' + port;
+      if (!this.eventRegistry[key]) {
+        this.eventRegistry[key] = [];
+      }
+      // debug("1", JSON.parse(body).characteristics);
+      this.eventRegistry[key] = this.eventRegistry[key].concat(JSON.parse(body).characteristics);
+      // debug("2", JSON.stringify(this.eventRegistry[key]));
       try {
         rsp = JSON.parse(response.body);
       } catch (ex) {
@@ -241,7 +288,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
       }
       callback(null, rsp);
     }
-  });
+  }.bind(this));
 };
 
 /**

@@ -15,11 +15,16 @@
         -   [Parameters][11]
     -   [HAPstatus][12]
         -   [Parameters][13]
--   [HAPNodeJSClient#hapEvent][14]
+-   [HAPNodeJSClient#Disconnected][14]
     -   [Properties][15]
     -   [Examples][16]
--   [Request][17]
-    -   [Parameters][18]
+-   [HAPNodeJSClient#hapEvent][17]
+    -   [Properties][18]
+    -   [Examples][19]
+-   [\_reconnectServer][20]
+    -   [Parameters][21]
+-   [Request][22]
+    -   [Parameters][23]
 
 ## HAPNodeJSClient
 
@@ -33,10 +38,10 @@ Events
 
 ### Properties
 
--   `debug` **[boolean][19]** Enable debug logging, defaults to false
--   `pin` **[string][20]** Homebridge PIN, defaults to '031-45-154'
--   `refresh` **[number][21]** Discovery refresh, defaults to 15 minutes
--   `timeout` **[number][21]** Discovery timeout, defaults to 20 seconds
+-   `debug` **[boolean][24]** Enable debug logging, defaults to false
+-   `pin` **[string][25]** Homebridge PIN, defaults to '031-45-154'
+-   `refresh` **[number][26]** Discovery refresh, defaults to 15 minutes
+-   `timeout` **[number][26]** Discovery timeout, defaults to 20 seconds
 
 ### HAPaccessories
 
@@ -92,17 +97,13 @@ HAPNodeJSClient.prototype.HAPstatus - Get current status for characteristics
 -   `body` **type** description
 -   `callback` **type** Callback to execute upon completion of characteristic getting, function(err, response)
 
-## HAPNodeJSClient#hapEvent
+## HAPNodeJSClient#Disconnected
 
 HomeKit Accessory Characteristic event pass thru
 
 ### Properties
 
--   `host` **[string][20]** IP Address of homebridge instance generating event
--   `port` **[number][21]** Port of homebridge instance generating event
--   `aid` **[number][21]** Accessory ID of accessory generating event
--   `iid` **[number][21]** Instance ID of accessory characteristic generating event
--   `value` **[object][22]** Updated characteristic value
+-   `server` **[string][25]** IP Address and port of disconnected homebridge
 
 ### Examples
 
@@ -111,6 +112,36 @@ Sample Message
 
 { host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
 ```
+
+## HAPNodeJSClient#hapEvent
+
+HomeKit Accessory Characteristic event pass thru
+
+### Properties
+
+-   `host` **[string][25]** IP Address of homebridge instance generating event
+-   `port` **[number][26]** Port of homebridge instance generating event
+-   `aid` **[number][26]** Accessory ID of accessory generating event
+-   `iid` **[number][26]** Instance ID of accessory characteristic generating event
+-   `value` **[object][27]** Updated characteristic value
+
+### Examples
+
+```javascript
+Sample Message
+
+{ host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
+```
+
+## \_reconnectServer
+
+\_reconnectServer - Reconnect to event server
+
+### Parameters
+
+-   `server` **type** IP Address and port of disconnected homebridge server
+
+Returns **type** description
 
 ## Request
 
@@ -150,20 +181,30 @@ Returns **type** description
 
 [13]: #parameters-5
 
-[14]: #hapnodejsclienthapevent
+[14]: #hapnodejsclientdisconnected
 
 [15]: #properties-1
 
 [16]: #examples
 
-[17]: #request
+[17]: #hapnodejsclienthapevent
 
-[18]: #parameters-6
+[18]: #properties-2
 
-[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[19]: #examples-1
 
-[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[20]: #_reconnectserver
 
-[21]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[21]: #parameters-6
 
-[22]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[22]: #request
+
+[23]: #parameters-7
+
+[24]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
