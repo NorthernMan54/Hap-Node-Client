@@ -104,26 +104,30 @@ function _discovery() {
       type: 'hap'
     }, function(instance) {
       // debug('Found an HAP server:', instance);
-      debug("HAP Device discovered", instance.txt.md, instance.addresses);
-      var ipAddress;
-      for (let address of instance.addresses) {
-        if (ip.isV4Format(address)) {
-          ipAddress = address;
-          break;
-        }
-      }
-
-      debug("HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
-      _getAccessories.call(this, ipAddress, instance, function(err, data) {
-        if (!err) {
-          debug("Homebridge instance discovered %s with %s accessories", instance.name, Object.keys(data.accessories.accessories).length);
-          if (Object.keys(data.accessories.accessories).length > 0) {
-            discovered.push(data);
+      if (instance.txt) {
+        debug("HAP Device discovered", instance.txt.md, instance.addresses);
+        var ipAddress;
+        for (let address of instance.addresses) {
+          if (ip.isV4Format(address)) {
+            ipAddress = address;
+            break;
           }
-        } else {
-          // Error, no data
         }
-      });
+
+        debug("HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
+        _getAccessories.call(this, ipAddress, instance, function(err, data) {
+          if (!err) {
+            debug("Homebridge instance discovered %s with %s accessories", instance.name, Object.keys(data.accessories.accessories).length);
+            if (Object.keys(data.accessories.accessories).length > 0) {
+              discovered.push(data);
+            }
+          } else {
+            // Error, no data
+          }
+        });
+      } else {
+        debug("Unsupported device found, skipping", instance.host, instance.addresses);
+      }
     }.bind(this));
 
     setTimeout(_discoveryEnd.bind(this), this.timeout * 1000); // End discover after 'timeout' seconds
