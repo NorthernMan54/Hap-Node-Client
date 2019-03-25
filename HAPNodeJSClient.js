@@ -230,7 +230,7 @@ function _reconnectServer(server) {
     if (err) {
       debug("HAPevent event reregister failed, retry in 60", server, err);
     } else {
-      debug("HAPevent event reregister succedded", server);
+      debug("HAPevent event reregister succeeded", server);
       clearInterval(reconnectTimer);
     }
   }
