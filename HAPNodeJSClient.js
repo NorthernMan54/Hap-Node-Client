@@ -282,6 +282,10 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
       // debug("1", JSON.parse(body).characteristics);
       this.eventRegistry[key] = this.eventRegistry[key].concat(JSON.parse(body).characteristics);
       // debug("2", JSON.stringify(this.eventRegistry[key]));
+      this.eventRegistry[key].sort((a, b) => (JSON.stringify(a) > JSON.stringify(b)) ? 1 : ((JSON.stringify(b) > JSON.stringify(a)) ? -1 : 0));
+      // debug("3", JSON.stringify(this.eventRegistry[key]));
+      this.eventRegistry[key] = Array.from(new Set(this.eventRegistry[key].map(JSON.stringify))).map(JSON.parse);
+      // debug("4", JSON.stringify(this.eventRegistry[key]));
       try {
         rsp = JSON.parse(response.body);
       } catch (ex) {
