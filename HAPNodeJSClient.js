@@ -37,6 +37,7 @@ function HAPNodeJSClient(options) {
   this.refresh = options['refresh'] || 900;
   this.timeout = options['timeout'] || 20;
   this.pin = options['pin'] || '031-45-154';
+  this.filter = options['filter'] || false;
   if (this.debug) {
     let debugEnable = require('debug');
     let namespaces = debugEnable.disable();
@@ -113,18 +114,22 @@ function _discovery() {
             break;
           }
         }
-
-        debug("HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
-        _getAccessories.call(this, ipAddress, instance, function(err, data) {
-          if (!err) {
-            debug("Homebridge instance discovered %s with %s accessories", instance.name, Object.keys(data.accessories.accessories).length);
-            if (Object.keys(data.accessories.accessories).length > 0) {
-              discovered.push(data);
+        // debug("HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
+        if ((this.filter && this.filter === ipAddress + ":" + instance.port) || !this.filter) {
+          debug("HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
+          _getAccessories.call(this, ipAddress, instance, function(err, data) {
+            if (!err) {
+              debug("Homebridge instance discovered %s with %s accessories", instance.name, Object.keys(data.accessories.accessories).length);
+              if (Object.keys(data.accessories.accessories).length > 0) {
+                discovered.push(data);
+              }
+            } else {
+              // Error, no data
             }
-          } else {
-            // Error, no data
-          }
-        });
+          }); // end of _getAccessories
+        } else {
+          debug("Filtered HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
+        }
       } else {
         debug("Unsupported device found, skipping", instance.host, instance.addresses);
       }
