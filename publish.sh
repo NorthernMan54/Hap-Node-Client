@@ -3,7 +3,6 @@
 if npm audit; then
   rm *orig* *toc\.*
   npm run-script document
-  npm run-script api
   git add .
   npm version patch -m "$1" --force
   npm publish
