@@ -440,7 +440,7 @@ function _getAccessories(ipAddress, instance, callback) {
       callback(err);
     } else {
       // debug("_getAccessories", response.body);
-      var message = JSON.parse(response.body);
+      var message = JSON.parse(response.body.replace(/\uFFFD/g, ''));
       if (message && Object.keys(message.accessories).length > 0) {
         callback(null, {
           "ipAddress": ipAddress,
