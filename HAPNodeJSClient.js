@@ -27,6 +27,7 @@ module.exports = {
  * @property {string} pin - Homebridge PIN, defaults to '031-45-154'
  * @property {number} refresh - Discovery refresh, defaults to 15 minutes
  * @property {number} timeout - Discovery timeout, defaults to 20 seconds
+ * @property {number} reqTimeout - Accessory request timeout, defaults to 7 seconds
  * @example
  *
  */
@@ -36,6 +37,7 @@ function HAPNodeJSClient(options) {
   this.debug = options['debug'] || false;
   this.refresh = options['refresh'] || 900;
   this.timeout = options['timeout'] || 20;
+  this.reqTimeout = options['reqTimeout'] || 7000;
   this.pin = options['pin'] || '031-45-154';
   this.filter = options['filter'] || false;
   if (this.debug) {
@@ -178,7 +180,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
     eventBus: this._eventBus,
     method: 'PUT',
     url: 'http://' + ipAddress + ':' + port + '/characteristics',
-    timeout: 7000,
+    timeout: this.reqTimeout,
     maxAttempts: 1, // (default) try 5 times
     headers: {
       "Content-Type": "Application/json",
@@ -255,7 +257,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
     eventBus: this._eventBus,
     method: 'PUT',
     url: 'http://' + ipAddress + ':' + port + '/characteristics',
-    timeout: 7000,
+    timeout: this.reqTimeout,
     maxAttempts: 1, // (default) try 5 times
     headers: {
       "Content-Type": "Application/json",
@@ -318,7 +320,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     eventBus: this._eventBus,
     method: 'POST',
     url: 'http://' + ipAddress + ':' + port + '/resource',
-    timeout: 7000,
+    timeout: this.reqTimeout,
     maxAttempts: 1, // (default) try 5 times
     headers: {
       "Content-Type": "Application/json",
@@ -369,7 +371,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
     eventBus: this._eventBus,
     method: 'GET',
     url: 'http://' + ipAddress + ':' + port + '/characteristics' + body,
-    timeout: 7000,
+    timeout: this.reqTimeout,
     maxAttempts: 1, // (default) try 5 times
     headers: {
       "Content-Type": "Application/json",
@@ -412,7 +414,7 @@ function _getAccessories(ipAddress, instance, callback) {
     eventBus: this._eventBus,
     method: 'GET',
     url: 'http://' + ipAddress + ':' + instance.port + '/accessories',
-    timeout: 7000,
+    timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     retryDelay: 5000, // (default) wait for 5s before trying again
     headers: {
