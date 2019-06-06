@@ -12,8 +12,6 @@
     "document": "./gh-md-toc --insert README.md"
   },
   "devDependencies": {
-    "ava": "^1.2.1",
-    "coveralls": "3.0.2",
     "documentation": "11.0.0"
   },
   "dependencies": {
