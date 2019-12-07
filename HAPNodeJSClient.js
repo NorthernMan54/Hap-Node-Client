@@ -442,7 +442,12 @@ function _getAccessories(ipAddress, instance, callback) {
       callback(err);
     } else {
       // debug("_getAccessories", response.body);
-      var message = JSON.parse(response.body.replace(/\uFFFD/g, ''));
+      try {
+        var message = JSON.parse(response.body.replace(/\uFFFD/g, ''));
+      } catch (err) {
+        debug("HAP Json Msg Parse failed %s http://%s:%s error code %s", instance.txt.md, ipAddress, instance.port, response.statusCode);
+        callback(err);
+      }
       if (message && Object.keys(message.accessories).length > 0) {
         callback(null, {
           "ipAddress": ipAddress,
