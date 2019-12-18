@@ -367,6 +367,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
  */
 
 HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
+  debug("HAPstatus", this.pin);
   request({
     eventBus: this._eventBus,
     method: 'GET',
@@ -381,6 +382,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
   }, function(err, response) {
     // Response s/b 200 OK
     // debug("HAPstatus", 'http://' + ipAddress + ':' + port + '/characteristics' + body);
+    debug("HAPstatus-1", this.pin);
     if (err) {
       //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
       callback(err);
