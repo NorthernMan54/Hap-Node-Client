@@ -367,7 +367,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
  */
 
 HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
-  debug("HAPstatus", this.pin);
+  // debug("HAPstatus", this.pin);
   request({
     eventBus: this._eventBus,
     method: 'GET',
@@ -382,7 +382,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
   }, function(err, response) {
     // Response s/b 200 OK
     // debug("HAPstatus", 'http://' + ipAddress + ':' + port + '/characteristics' + body);
-    debug("HAPstatus-1", this.pin);
+    // debug("HAPstatus-1", this.pin);
     if (err) {
       //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
       callback(err);
@@ -433,7 +433,7 @@ function _getAccessories(ipAddress, instance, callback) {
       } else {
         // Status code = 401 = homebridge not running in insecure mode
         if (response.statusCode === 401) {
-          debug("HAP Discover failed %s http://%s:%s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, ipAddress, instance.port, response);
+          debug("HAP Discover failed %s http://%s:%s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, ipAddress, instance.port);
           err = new Error("homebridge is not running in insecure mode with -I", response.statusCode);
         } else {
           debug("HAP Discover failed %s http://%s:%s error code %s", instance.txt.md, ipAddress, instance.port, response.statusCode);
