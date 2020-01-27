@@ -452,9 +452,10 @@ function _getAccessories(ipAddress, instance, callback) {
       }
       if (message && Object.keys(message.accessories).length > 0) {
         callback(null, {
-          "ipAddress": ipAddress,
-          "instance": instance,
-          "accessories": message
+          ipAddress: ipAddress,
+          instance: instance,
+          accessories: message,
+          hapService: instance.fqdn
         });
       } else {
         debug("Short json data received http://%s:%s", ipAddress, instance.port, JSON.stringify(response));
