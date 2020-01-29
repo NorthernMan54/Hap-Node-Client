@@ -194,7 +194,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
     if (err) {
       debug("Homebridge Control failed %s:%s", ipAddress, port, body, err.message);
       callback(err);
-    } else if (response.statusCode !== 207) {
+    } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401) {
         debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
         callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
