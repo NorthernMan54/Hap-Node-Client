@@ -204,13 +204,15 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
       }
     } else {
       var rsp;
-      try {
-        rsp = JSON.parse(response.body);
-      } catch (ex) {
-        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
-        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
+      if (response.statusCode !== 204) {
+        try {
+          rsp = JSON.parse(response.body);
+        } catch (ex) {
+          debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
+          debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
 
-        callback(new Error(ex));
+          callback(new Error(ex));
+        }
       }
       callback(null, rsp);
     }
@@ -271,7 +273,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
     if (err) {
       debug("Homebridge event reg failed %s:%s", ipAddress, port, body, err.message);
       callback(err);
-    } else if (response.statusCode !== 207) {
+    } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401) {
         debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
         callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
@@ -386,7 +388,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
     if (err) {
       //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
       callback(err);
-    } else if (response.statusCode !== 207) {
+    } else if (response.statusCode !== 207 && response.statusCode !== 200) {
       if (response.statusCode === 401) {
         debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
         callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
