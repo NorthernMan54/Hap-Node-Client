@@ -195,7 +195,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
       debug("Homebridge Control failed %s:%s", ipAddress, port, body, err.message);
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
-      if (response.statusCode === 401) {
+      if (response.statusCode === 401 || response.statusCode === 470) {
         debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
         callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
       } else {
@@ -274,7 +274,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
       debug("Homebridge event reg failed %s:%s", ipAddress, port, body, err.message);
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
-      if (response.statusCode === 401) {
+      if (response.statusCode === 401 || response.statusCode === 470) {
         debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
         callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
       } else {
@@ -337,7 +337,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
       //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
       callback(err);
     } else if (response.statusCode !== 200) {
-      if (response.statusCode === 401) {
+      if (response.statusCode === 401 || response.statusCode === 470) {
         debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err);
         callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
       } else {
@@ -389,7 +389,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
       //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 200) {
-      if (response.statusCode === 401) {
+      if (response.statusCode === 401 || response.statusCode === 470) {
         debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
         callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
       } else {
@@ -433,8 +433,8 @@ function _getAccessories(ipAddress, instance, callback) {
       if (err) {
         debug("HAP Discover failed %s http://%s:%s error %s", instance.txt.md, ipAddress, instance.port, err.code);
       } else {
-        // Status code = 401 = homebridge not running in insecure mode
-        if (response.statusCode === 401) {
+        // Status code = 401/470 = homebridge not running in insecure mode
+        if (response.statusCode === 401 || response.statusCode === 470) {
           debug("HAP Discover failed %s http://%s:%s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, ipAddress, instance.port);
           err = new Error("homebridge is not running in insecure mode with -I", response.statusCode);
         } else {
