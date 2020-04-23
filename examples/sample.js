@@ -14,8 +14,8 @@ var queue = new Queue(function(request, cb) {
 
 var options = {
   // clientId: this.username,
-  debug: false,
-  refresh: 20, // Seconds
+  debug: true,
+  refresh: 40, // Seconds
   timeout: 5, // Seconds
   reqTimeout: 7000, // Milli seconds
   pin: '031-45-154',
@@ -38,11 +38,12 @@ homebridge.on('Ready', function() {
 function alexaDiscovery(message, callback) {
   // debug('alexaDiscovery', this);
   homebridge.HAPaccessories(function(endPoints) {
+    debug("-------------------------------------------------------");
     debug("alexaDiscovery", endPoints.length);
     var response;
 
     endPoints.forEach(function(entry) {
-      console.log(entry.hapService);
+      // console.log(entry.hapService);
       queue.push(entry.hapService, function(err, data) {
         if (err) {
           debug('mdnsLookup FAILED', entry.hapService, err.message);
@@ -52,14 +53,13 @@ function alexaDiscovery(message, callback) {
       });
     });
 
-
     // debug("Discovery Response", JSON.stringify(response, null, 4));
     callback(null, response);
   }.bind(this));
 }
 
 function mdnsLookup(serviceName, callback) {
-  // console.log("mdnsLookup", serviceName);
+  debug("\nmdnsLookup start", serviceName);
   if (mdnsCache[serviceName]) {
     debug('cached', mdnsCache[serviceName]);
     callback(null, mdnsCache[serviceName]);
@@ -67,7 +67,7 @@ function mdnsLookup(serviceName, callback) {
     resolver.resolveSrv(serviceName).then(function(service) {
       debug('resolve', service);
       resolver.resolve4(service.target).then(function(host) {
-        debug('resolve4', host);
+        // debug('resolve4', host);
         mdnsCache[serviceName] = {
           host: host,
           port: service.port
