@@ -8,6 +8,7 @@ var inherits = require('util').inherits;
 var debug = require('debug')('hapNodeJSClient');
 var bonjour = require('bonjour')();
 var ip = require('ip');
+var normalizeUUID = require('./lib/util.js').normalizeUUID;
 
 var discovered = [];
 
@@ -451,7 +452,7 @@ function _getAccessories(ipAddress, instance, callback) {
     } else {
       // debug("_getAccessories", response.body);
       try {
-        var message = JSON.parse(response.body.replace(/\uFFFD/g, ''));
+        var message = normalizeUUID(JSON.parse(response.body.replace(/\uFFFD/g, '')));
       } catch (err) {
         debug("HAP Json Msg Parse failed %s http://%s:%s error code %s", instance.txt.md, ipAddress, instance.port, response.statusCode);
         callback(err);
