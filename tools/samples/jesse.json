@@ -1,0 +1,2487 @@
+{
+  "accessories": [{
+    "aid": 1,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "homebridge.io",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "homebridge",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Raj",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "BC:22:3D:E3:CF:32",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.4.53",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 2000000008,
+      "type": "49FB9D4D-0FEA-4BF1-8FA6-E7B18AB86DCE",
+      "characteristics": [{
+        "iid": 9,
+        "type": "77474A2F-FA98-485E-97BE-4762458774D8",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "State",
+        "maxValue": 1,
+        "minValue": 0,
+        "minStep": 1
+      }, {
+        "iid": 10,
+        "type": "FD9FE4CC-D06F-4FFE-96C6-595D464E1026",
+        "perms": ["pr", "ev"],
+        "format": "string",
+        "value": "1.0",
+        "description": "Version"
+      }, {
+        "iid": 11,
+        "type": "5819A4C2-E1B0-4C9D-B761-3EB1AFF43073",
+        "perms": ["pr", "pw", "ev"],
+        "format": "data",
+        "value": null,
+        "description": "Control Point"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 26,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "homebridge-rtl_433",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Temperature Sensor with Alarm @ 10",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Fridge",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Fridge",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.0.21",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "8A",
+      "characteristics": [{
+        "iid": 9,
+        "type": "23",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Fridge",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 4.4,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 11,
+      "type": "00000080-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 12,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Fridge Alarm",
+        "description": "Name"
+      }, {
+        "iid": 13,
+        "type": "0000006A-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Contact Sensor State",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 14,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 15,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Fridge History",
+        "description": "Name"
+      }, {
+        "iid": 16,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "WJgAAAAAAACJ1FMkAwECAgIDAkQAwA8AAAAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 17,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": null,
+        "description": "S2R2"
+      }, {
+        "iid": 18,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 19,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 27,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "homebridge-rtl_433",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Temperature Sensor with Alarm @ -5",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Freezer",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Freezer",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.0.21",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Freezer",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": -16.7,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 11,
+      "type": "00000080-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 12,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Freezer Alarm",
+        "description": "Name"
+      }, {
+        "iid": 13,
+        "type": "0000006A-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Contact Sensor State",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 14,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 15,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Freezer History",
+        "description": "Name"
+      }, {
+        "iid": 16,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "WJgAAAAAAACJ1FMkAwECAgIDAkQAwA8AAAAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 17,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": null,
+        "description": "S2R2"
+      }, {
+        "iid": 18,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 19,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 28,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "homebridge-rtl_433",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Temperature Sensor",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Neighbour",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Neighbour",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.0.21",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Neighbour",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 0,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 11,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 12,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Neighbour History",
+        "description": "Name"
+      }, {
+        "iid": 13,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": null,
+        "description": "S2R1"
+      }, {
+        "iid": 14,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": null,
+        "description": "S2R2"
+      }, {
+        "iid": 15,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 16,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 29,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "homebridge-rtl_433",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Temperature Sensor",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Trailer Fridge",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Trailer Fridge",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.0.21",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Trailer Fridge",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 2.4,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 11,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 12,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Trailer Fridge History",
+        "description": "Name"
+      }, {
+        "iid": 13,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "WJgAAAAAAACJ1FMkAwECAgIDAkQAwA8AAAAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 14,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": null,
+        "description": "S2R2"
+      }, {
+        "iid": 15,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 16,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 5,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "rf-fan-remote",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "rf-fan-remote",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Master",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Master",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.27",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000040-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Master fan",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }, {
+        "iid": 11,
+        "type": "00000029-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "float",
+        "value": 25,
+        "description": "Rotation Speed",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 25
+      }, {
+        "iid": 12,
+        "type": "00000028-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "int",
+        "value": 1,
+        "description": "Rotation Direction",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 13,
+      "type": "00000043-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 14,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Master light",
+        "description": "Name"
+      }, {
+        "iid": 15,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 6,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "rf-fan-remote",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "rf-fan-remote",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Bedroom",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Bedroom",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.27",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000040-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Bedroom fan",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }, {
+        "iid": 11,
+        "type": "00000029-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "float",
+        "value": 25,
+        "description": "Rotation Speed",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 25
+      }, {
+        "iid": 12,
+        "type": "00000028-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "int",
+        "value": 1,
+        "description": "Rotation Direction",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 13,
+      "type": "00000043-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 14,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Bedroom light",
+        "description": "Name"
+      }, {
+        "iid": 15,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 7,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "hampton-bay",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "hampton-bay",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Ceiling Two",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Ceiling Two",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.0.30",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000040-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Fan Two",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }, {
+        "iid": 11,
+        "type": "00000029-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "float",
+        "value": 30,
+        "description": "Rotation Speed",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 5
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 12,
+      "type": "00000043-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 13,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Ceiling Two light",
+        "description": "Name"
+      }, {
+        "iid": 14,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 8,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "hampton-bay",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "hampton-bay",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Ceiling One",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Ceiling One",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.0.30",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000040-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Fan One",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }, {
+        "iid": 11,
+        "type": "00000029-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "float",
+        "value": 30,
+        "description": "Rotation Speed",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 5
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 12,
+      "type": "00000043-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 13,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Ceiling One light",
+        "description": "Name"
+      }, {
+        "iid": 14,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 9,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "HTTP-IRBlaster",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Default-Model",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Tuner",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Tuner",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.39",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000049-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Tuner",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 10,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "HTTP-IRBlaster",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Default-Model",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Music Port",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Music Port",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.39",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000049-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Music Port",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 11,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "HTTP-IRBlaster",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Default-Model",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Panasonic",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "jesse-Panasonic",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.39",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000040-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Panasonic",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": true,
+        "description": "On"
+      }, {
+        "iid": 11,
+        "type": "00000029-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "float",
+        "value": 15,
+        "description": "Rotation Speed",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 12,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT Reset Switch",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT Reset Switch",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "123456",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000049-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT Reset Switch",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000025-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "pw", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "On"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 13,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "BME-YL NODE-86695LS",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-86695LS",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "http://NODE-86695.local.:80/",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000083-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Water Tank",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000070-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 1,
+        "description": "Leak Detected",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }, {
+        "iid": 11,
+        "type": "00000079-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Status Low Battery",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 14,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "BME-YL",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-86695",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "raj-NODE-86695",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.54",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Water Tank",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 8.5,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }, {
+        "iid": 11,
+        "type": "00000010-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 82,
+        "description": "Current Relative Humidity",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }, {
+        "iid": 12,
+        "type": "000000B5-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 47.6,
+        "description": "Water Level",
+        "maxValue": 100,
+        "minValue": 0
+      }, {
+        "iid": 13,
+        "type": "00000070-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 1,
+        "description": "Leak Detected",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }, {
+        "iid": 14,
+        "type": "E863F10F-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 999,
+        "description": "Air Pressure",
+        "unit": "mbar",
+        "maxValue": 1200,
+        "minValue": 800,
+        "minStep": 1
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 15,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 16,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-86695 History",
+        "description": "Name"
+      }, {
+        "iid": 17,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "SlgcAAAAAACXFDgkAwECAgIDAq8IwA8AAAAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 18,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "AA==",
+        "description": "S2R2"
+      }, {
+        "iid": 19,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 20,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 15,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "DHT-YL NODE-18A6B3LS",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-18A6B3LS",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "http://NODE-18A6B3.local.:80/",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "00000083-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Water Meter",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000070-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Leak Detected",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }, {
+        "iid": 11,
+        "type": "00000079-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Status Low Battery",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 16,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "DHT-YL",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-18A6B3",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "raj-NODE-18A6B3",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.54",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Water Meter",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 8,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }, {
+        "iid": 11,
+        "type": "00000010-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 94,
+        "description": "Current Relative Humidity",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }, {
+        "iid": 12,
+        "type": "000000B5-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 6,
+        "description": "Water Level",
+        "maxValue": 100,
+        "minValue": 0
+      }, {
+        "iid": 13,
+        "type": "00000070-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Leak Detected",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 14,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 15,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-18A6B3 History",
+        "description": "Name"
+      }, {
+        "iid": 16,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "SlgcAAAAAACXFDgkAwECAgIDAq8IwA8AAAAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 17,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "AA==",
+        "description": "S2R2"
+      }, {
+        "iid": 18,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 19,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 17,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "BME",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-8689D",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "raj-NODE-8689D",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.54",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Backyard",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 4.6,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }, {
+        "iid": 11,
+        "type": "00000010-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 93,
+        "description": "Current Relative Humidity",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }, {
+        "iid": 12,
+        "type": "E863F10F-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 998,
+        "description": "Air Pressure",
+        "unit": "mbar",
+        "maxValue": 1200,
+        "minValue": 800,
+        "minStep": 1
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 13,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 14,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-8689D History",
+        "description": "Name"
+      }, {
+        "iid": 15,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "SlgcAAAAAACXFDgkAwECAgIDAq8IwA8AAAAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 16,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "AA==",
+        "description": "S2R2"
+      }, {
+        "iid": 17,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 18,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 18,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "DHT-BAT",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-871ED8",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "raj-NODE-871ED8",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.54",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Bathroom",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 21.2,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }, {
+        "iid": 11,
+        "type": "00000010-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 35,
+        "description": "Current Relative Humidity",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }, {
+        "iid": 12,
+        "type": "00000079-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Status Low Battery",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 13,
+      "type": "00000096-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 14,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Bathroom",
+        "description": "Name"
+      }, {
+        "iid": 15,
+        "type": "00000068-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 100,
+        "description": "Battery Level",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }, {
+        "iid": 16,
+        "type": "0000008F-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Charging State",
+        "valid-values": [0, 1, 2],
+        "maxValue": 2,
+        "minValue": 0
+      }, {
+        "iid": 17,
+        "type": "00000079-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Status Low Battery",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 18,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 19,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-871ED8 History",
+        "description": "Name"
+      }, {
+        "iid": 20,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "SlgcAAAAAACXFDgkAwECAgIDAq8IwA8AAAAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 21,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "AA==",
+        "description": "S2R2"
+      }, {
+        "iid": 22,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 23,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 19,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "BME",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-AC5811",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "raj-NODE-AC5811",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.54",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Bunkie",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 17.8,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }, {
+        "iid": 11,
+        "type": "00000010-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 63,
+        "description": "Current Relative Humidity",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }, {
+        "iid": 12,
+        "type": "E863F10F-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 998,
+        "description": "Air Pressure",
+        "unit": "mbar",
+        "maxValue": 1200,
+        "minValue": 800,
+        "minStep": 1
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 13,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 14,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-AC5811 History",
+        "description": "Name"
+      }, {
+        "iid": 15,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "SlgcAAAAAACXFDgkAwECAgIDAq8IwA8AAAAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 16,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "AA==",
+        "description": "S2R2"
+      }, {
+        "iid": 17,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 18,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 20,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "MCUIOT",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "DHT",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-19762",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "raj-NODE-19762",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.54",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Trailer",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 7.3,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }, {
+        "iid": 11,
+        "type": "00000010-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 54,
+        "description": "Current Relative Humidity",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 12,
+      "type": "E863F007-079E-48FF-8F27-9C2605A29F52",
+      "characteristics": [{
+        "iid": 13,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "NODE-19762 History",
+        "description": "Name"
+      }, {
+        "iid": 14,
+        "type": "E863F116-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "qtKOAQAAAAAIWY4iAwECAgIDAsAPwA9tgwAAAAAAAAEB",
+        "description": "S2R1"
+      }, {
+        "iid": 15,
+        "type": "E863F117-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "hd"],
+        "format": "data",
+        "value": "AA==",
+        "description": "S2R2"
+      }, {
+        "iid": 16,
+        "type": "E863F11C-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W1"
+      }, {
+        "iid": 17,
+        "type": "E863F121-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pw", "hd"],
+        "format": "data",
+        "description": "S2W2"
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }, {
+    "aid": 21,
+    "services": [{
+      "iid": 1,
+      "type": "0000003E-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 2,
+        "type": "00000014-0000-1000-8000-0026BB765291",
+        "perms": ["pw"],
+        "format": "bool",
+        "description": "Identify"
+      }, {
+        "iid": 3,
+        "type": "00000020-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "WSSENSOR",
+        "description": "Manufacturer"
+      }, {
+        "iid": 4,
+        "type": "00000021-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "BME-MS 2.0",
+        "description": "Model"
+      }, {
+        "iid": 5,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Porch Motion",
+        "description": "Name"
+      }, {
+        "iid": 6,
+        "type": "00000030-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "raj-NODE-2BA0FF",
+        "description": "Serial Number"
+      }, {
+        "iid": 7,
+        "type": "00000052-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "0.1.42",
+        "description": "Firmware Revision"
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 8,
+      "type": "0000008A-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 9,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Porch Motion",
+        "description": "Name"
+      }, {
+        "iid": 10,
+        "type": "00000011-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 7.5,
+        "description": "Current Temperature",
+        "unit": "celsius",
+        "maxValue": 100,
+        "minValue": -100,
+        "minStep": 0.1
+      }, {
+        "iid": 11,
+        "type": "00000010-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "float",
+        "value": 69,
+        "description": "Current Relative Humidity",
+        "unit": "percentage",
+        "maxValue": 100,
+        "minValue": 0,
+        "minStep": 1
+      }, {
+        "iid": 12,
+        "type": "E863F10F-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 998,
+        "description": "Air Pressure",
+        "unit": "mbar",
+        "maxValue": 1200,
+        "minValue": 700,
+        "minStep": 1
+      }, {
+        "iid": 13,
+        "type": "00000079-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Status Low Battery",
+        "valid-values": [0, 1],
+        "maxValue": 1,
+        "minValue": 0
+      }],
+      "primary": false,
+      "hidden": false
+    }, {
+      "iid": 14,
+      "type": "00000085-0000-1000-8000-0026BB765291",
+      "characteristics": [{
+        "iid": 15,
+        "type": "00000023-0000-1000-8000-0026BB765291",
+        "perms": ["pr"],
+        "format": "string",
+        "value": "Porch Motion",
+        "description": "Name"
+      }, {
+        "iid": 16,
+        "type": "00000022-0000-1000-8000-0026BB765291",
+        "perms": ["pr", "ev"],
+        "format": "bool",
+        "value": false,
+        "description": "Motion Detected"
+      }, {
+        "iid": 17,
+        "type": "E863F120-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "pw"],
+        "format": "uint8",
+        "value": 0,
+        "description": "Sensitivity",
+        "valid-values": [0, 4, 7],
+        "unit": "seconds",
+        "maxValue": 7,
+        "minValue": 0
+      }, {
+        "iid": 18,
+        "type": "E863F11A-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev"],
+        "format": "uint32",
+        "value": 0,
+        "description": "Last Activation",
+        "unit": "seconds"
+      }, {
+        "iid": 19,
+        "type": "E863F12D-079E-48FF-8F27-9C2605A29F52",
+        "perms": ["pr", "ev", "pw"],
+        "format": "uint16",
+        "value": 5,
+        "description": "Duration",
+        "valid-values": [5, 10, 20, 30, 60, 120, 180, 300, 600, 1200, 1800, 3600, 7200, 10800, 18000, 36000, 43200, 54000],
+        "unit": "seconds",
+        "maxValue": 54000,
+        "minValue": 5
+      }],
+      "primary": false,
+      "hidden": false
+    }]
+  }]
+}
