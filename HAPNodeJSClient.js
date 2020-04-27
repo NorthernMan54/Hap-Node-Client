@@ -111,21 +111,31 @@ function _discovery() {
   }.bind(this));
 }
 
-function _mdnsLookup(serviceName, callback) {
+function _mdnsLookup(deviceID, callback) {
   // debug("\nmdnsLookup start", serviceName);
-  if (mdnsCache[serviceName]) {
+  if (mdnsCache[deviceID]) {
     // debug('cached', mdnsCache[serviceName].url);
-    callback(null, mdnsCache[serviceName]);
+    callback(null, mdnsCache[deviceID]);
   } else {
     _populateCache(4, null, function() {
-      if (mdnsCache[serviceName]) {
-        debug('refreshed', mdnsCache[serviceName].url);
-        callback(null, mdnsCache[serviceName]);
+      if (mdnsCache[deviceID]) {
+        debug('refreshed', mdnsCache[deviceID].url);
+        callback(null, mdnsCache[deviceID]);
       } else {
-        callback(new Error("ERROR: HB Instance not found", serviceName), null);
+        callback(new Error("ERROR: HB Instance not found", deviceID), null);
       }
     });
   }
+}
+
+function _mdnsError(deviceID) {
+  // debug("\_mdnsError ", deviceID);
+  mdnsCache[deviceID] = false;
+  _populateCache(4, null, function() {
+    if (mdnsCache[deviceID]) {
+      debug('refreshed', mdnsCache[deviceID].url);
+    }
+  });
 }
 
 function _populateCache(timeout, discovery, callback) {
@@ -147,14 +157,17 @@ function _populateCache(timeout, discovery, callback) {
         }
       }
       // debug("result", result);
-      mdnsCache[result.txt.md] = {
+      mdnsCache[result.txt.id] = {
         host: ipAddress,
         port: result.port,
         url: url,
-        name: result.txt.md,
+        deviceID: result.txt.id,
         txt: result.txt
       };
-      discovery.call(this, mdnsCache[result.txt.md], function() {});
+      // debug("discovery", discovery);
+      if (discovery) {
+        discovery.call(this, mdnsCache[result.txt.id], function() {});
+      }
     } else {
       debug("Unsupported device found, skipping", result.name);
     }
@@ -182,12 +195,17 @@ HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
 // curl -X PUT http://127.0.0.1:51826/characteristics --header "Content-Type:Application/json"
 // --header "authorization: 031-45-154" --data "{ \"characteristics\": [{ \"aid\": 2, \"iid\": 9, \"value\": 0}] }"
 
-HAPNodeJSClient.prototype.HAPcontrolByName = function(homebridgeName, body, callback) {
-  _mdnsLookup(homebridgeName, function(err, instance) {
+HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callback) {
+  _mdnsLookup(deviceID, function(err, instance) {
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, body, callback);
+      HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, body, function(err, response) {
+        if (err) {
+          _mdnsError(deviceID);
+        }
+        callback(err, response);
+      });
     }
   }.bind(this));
 };
@@ -272,14 +290,19 @@ function _reconnectServer(server) {
   }
 }
 
-HAPNodeJSClient.prototype.HAPeventByName = function(homebridgeName, body, callback) {
+HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback) {
   // console.log("This-0", this);
-  _mdnsLookup(homebridgeName, function(err, instance) {
-      // console.log("This-1", this);
+  _mdnsLookup(deviceID, function(err, instance) {
+    // console.log("This-1", this);
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPevent.call(this, instance.host, instance.port, body, callback);
+      HAPNodeJSClient.prototype.HAPevent.call(this, instance.host, instance.port, body, function(err, response) {
+        if (err) {
+          _mdnsError(deviceID);
+        }
+        callback(err, response);
+      });
     }
   }.bind(this));
 };
@@ -348,14 +371,19 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
   }.bind(this));
 };
 
-HAPNodeJSClient.prototype.HAPresourceByName = function(homebridgeName, body, callback) {
+HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callback) {
   // console.log("This-0", this);
-  _mdnsLookup(homebridgeName, function(err, instance) {
-      // console.log("This-1", this);
+  _mdnsLookup(deviceID, function(err, instance) {
+    // console.log("This-1", this);
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, body, callback);
+      HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, body, function(err, response) {
+        if (err) {
+          _mdnsError(deviceID);
+        }
+        callback(err, response);
+      });
     }
   }.bind(this));
 };
@@ -412,14 +440,19 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
   });
 };
 
-HAPNodeJSClient.prototype.HAPstatusByName = function(homebridgeName, body, callback) {
+HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callback) {
   // console.log("This-0", this);
-  _mdnsLookup(homebridgeName, function(err, instance) {
-      // console.log("This-1", this);
+  _mdnsLookup(deviceID, function(err, instance) {
+    // console.log("This-1", this);
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, body, callback);
+      HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, body, function(err, response) {
+        if (err) {
+          _mdnsError(deviceID);
+        }
+        callback(err, response);
+      });
     }
   }.bind(this));
 };
@@ -479,7 +512,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
 };
 
 function _getAccessories(instance, callback) {
-  // debug("_getAccessories", 'http://' + ipAddress + ':' + instance.port + '/accessories');
+  // debug("_getAccessories", instance);
   if ((this.filter && this.filter === instance.host + ":" + instance.port) || !this.filter) {
     request({
       eventBus: this._eventBus,
@@ -498,14 +531,14 @@ function _getAccessories(instance, callback) {
       // debug("_getAccessories", response);
       if (err || response.statusCode !== 200) {
         if (err) {
-          debug("HAP Discover failed %s -> %s error %s", instance.name, instance.url, err.code);
+          debug("HAP Discover failed %s -> %s error %s", instance.txt.md, instance.url, err.code);
         } else {
           // Status code = 401/470 = homebridge not running in insecure mode
           if (response.statusCode === 401 || response.statusCode === 470) {
-            debug("HAP Discover failed %s -> %s invalid PIN or homebridge is not running in insecure mode with -I", instance.name, instance.url);
+            debug("HAP Discover failed %s -> %s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, instance.url);
             err = new Error("homebridge is not running in insecure mode with -I", response.statusCode);
           } else {
-            debug("HAP Discover failed %s -> %s http status code %s", instance.name, instance.url, response.statusCode);
+            debug("HAP Discover failed %s -> %s http status code %s", instance.txt.md, instance.url, response.statusCode);
             // debug("Message", response);
             err = new Error("Http Err", response.statusCode);
           }
@@ -516,27 +549,27 @@ function _getAccessories(instance, callback) {
         try {
           var message = normalizeUUID(JSON.parse(response.body.replace(/\uFFFD/g, '')));
         } catch (err) {
-          debug("HAP Json Msg Parse failed %s %s error code %s", instance.name, instance.url, response.statusCode);
+          debug("HAP Json Msg Parse failed %s %s error code %s", instance.txt.md, instance.url, response.statusCode);
           callback(err);
           return;
         }
         if (message && Object.keys(message.accessories).length > 0) {
-          debug("Homebridge instance discovered %s with %s accessories", instance.name, Object.keys(message.accessories).length);
+          debug("Homebridge instance discovered %s with %s accessories", instance.txt.md, Object.keys(message.accessories).length);
           discovered.push({
             ipAddress: instance.host,
             instance: instance,
             accessories: message,
-            hapService: instance.name,
-            name: instance.name
+            deviceID: instance.deviceID,
+            name: instance.txt.md
           });
           callback(null);
         } else {
-          debug("Short json data received %s -> %s", instance.name, instance.url, JSON.stringify(response));
-          callback(new Error("Short json data received %s -> %s", instance.name, instance.url));
+          debug("Short json data received %s -> %s", instance.txt.md, instance.url, JSON.stringify(response));
+          callback(new Error("Short json data received %s -> %s", instance.txt.md, instance.url));
         }
       }
     });
   } else {
-    debug("Filtered HAP instance address: %s -> %s", instance.name, instance.url);
+    debug("Filtered HAP instance address: %s -> %s", instance.txt.md, instance.url);
   }
 }
