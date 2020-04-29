@@ -6,11 +6,13 @@ var hapRequest = require('./lib/hapRequest.js');
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('util').inherits;
 var debug = require('debug')('hapNodeJSClient');
-var bonjour = require('bonjour')();
+var bonjour = require('bonjour-hap')();
 var ip = require('ip');
 var normalizeUUID = require('./lib/util.js').normalizeUUID;
 
 var discovered = [];
+var mdnsCache = [];
+var populateCache = false;
 
 module.exports = {
   HAPNodeJSClient: HAPNodeJSClient
@@ -103,52 +105,87 @@ inherits(HAPNodeJSClient, EventEmitter);
 function _discovery() {
   debug("Starting Homebridge instance discovery");
   discovered = [];
-  try {
-    this.browser = bonjour.find({
-      type: 'hap'
-    }, function(instance) {
-      // debug('Found an HAP server:', instance);
-      if (instance.txt) {
-        debug("HAP Device discovered", instance.txt.md, instance.addresses);
-        var ipAddress;
-        for (let address of instance.addresses) {
-          if (ip.isV4Format(address)) {
-            ipAddress = address;
-            break;
-          }
-        }
-        // debug("HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
-        if ((this.filter && this.filter === ipAddress + ":" + instance.port) || !this.filter) {
-          debug("HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
-          _getAccessories.call(this, ipAddress, instance, function(err, data) {
-            if (!err) {
-              debug("Homebridge instance discovered %s with %s accessories", instance.name, Object.keys(data.accessories.accessories).length);
-              if (Object.keys(data.accessories.accessories).length > 0) {
-                discovered.push(data);
-              }
-            } else {
-              // Error, no data
-            }
-          }); // end of _getAccessories
-        } else {
-          debug("Filtered HAP instance address: %s -> %s -> %s:%s", instance.txt.md, instance.host, ipAddress, instance.port);
-        }
-      } else {
-        debug("Unsupported device found, skipping", instance.host, instance.addresses);
-      }
-    }.bind(this));
+  // debug("this-0", this);
+  _populateCache(this.timeout, _getAccessories, function() {
+    debug("Ready");
+    this.emit('Ready', discovered);
+  }.bind(this));
+}
 
-    setTimeout(_discoveryEnd.bind(this), this.timeout * 1000); // End discover after 'timeout' seconds
-  } catch (ex) {
-    handleError(ex);
+function _mdnsLookup(deviceID, callback) {
+  // debug("\nmdnsLookup start", serviceName);
+  if (mdnsCache[deviceID]) {
+    // debug('cached', mdnsCache[serviceName].url);
+    callback(null, mdnsCache[deviceID]);
+  } else {
+    _populateCache(4, null, function() {
+      if (mdnsCache[deviceID]) {
+        // debug('refreshed', mdnsCache[deviceID]);
+        callback(null, mdnsCache[deviceID]);
+      } else {
+        callback(new Error("ERROR: HB Instance not found", deviceID), null);
+      }
+    });
   }
 }
 
-function _discoveryEnd() {
-  debug("Ending Homebridge instance discovery");
-  // debug("This", this);
-  this.emit('Ready', discovered);
-  this.browser.stop();
+function _mdnsError(deviceID) {
+  // debug("\_mdnsError ", deviceID);
+  mdnsCache[deviceID] = false;
+  _populateCache(4, null, function() {
+    if (mdnsCache[deviceID]) {
+      // debug('refreshed', mdnsCache[deviceID]);
+    }
+  });
+}
+
+function _populateCache(timeout, discovery, callback) {
+  // debug("_populateCache", populateCache);
+  if (!populateCache) {
+    populateCache = true;
+    // debug("_populateCache", new Error().stack);
+    var browser = bonjour.find({
+      type: 'hap'
+    }, function(result) {
+      if (result.txt) {
+        debug('HAP Device discovered', result.name);
+        var ipAddress, url;
+
+        for (const address of result.addresses) {
+          if (ip.isV4Format(address) && address.substring(0, 7) !== "169.254") {
+            ipAddress = address;
+            url = "http://" + ipAddress + ":" + result.port;
+            break;
+          } else if (ip.isV6Format(address)) {
+            ipAddress = address;
+            url = "http://[" + ipAddress + "]:" + result.port;
+          }
+        }
+        // debug("result", result);
+        mdnsCache[result.txt.id] = {
+          host: ipAddress,
+          port: result.port,
+          url: url,
+          deviceID: result.txt.id,
+          txt: result.txt
+        };
+        // debug("discovery", discovery);
+        if (discovery) {
+          discovery.call(this, mdnsCache[result.txt.id], function() {});
+        }
+      } else {
+        debug("Unsupported device found, skipping", result.name);
+      }
+    });
+    setTimeout(function() {
+      // debug('Timeout:');
+      browser.stop();
+      populateCache = false;
+      callback();
+    }, timeout * 1000);
+  } else {
+    callback();
+  }
 }
 
 /**
@@ -166,6 +203,21 @@ HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
 
 // curl -X PUT http://127.0.0.1:51826/characteristics --header "Content-Type:Application/json"
 // --header "authorization: 031-45-154" --data "{ \"characteristics\": [{ \"aid\": 2, \"iid\": 9, \"value\": 0}] }"
+
+HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callback) {
+  _mdnsLookup(deviceID, function(err, instance) {
+    if (err) {
+      callback(err);
+    } else {
+      HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, body, function(err, response) {
+        if (err) {
+          _mdnsError(deviceID);
+        }
+        callback(err, response);
+      });
+    }
+  }.bind(this));
+};
 
 /**
  * HAPNodeJSClient.prototype.HAPcontrol - Send a characteristic PUT Message to a particular homebridge instance
@@ -229,23 +281,98 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
  */
 
 function _reconnectServer(server) {
-  debug("HAPevent events Reregister", server, JSON.stringify(this.eventRegistry[server]));
-
-  var reconnectTimer = setInterval(function() {
-    this.HAPevent(server.split(':')[0], server.split(':')[1], JSON.stringify({
-      characteristics: this.eventRegistry[server]
-    }), clearTimer);
-  }.bind(this), 60000);
+  debug("HAPevent events Reregister", server);
+  // debug("This", this, server);
+  if (server.deviceID) {
+    var reconnectTimer = setInterval(function() {
+      this.HAPeventByDeviceID(server.deviceID, JSON.stringify({
+        characteristics: this.eventRegistry[server.deviceID]
+      }), clearTimer);
+    }.bind(this), 60000);
+  } else {
+    var reconnectTimer = setInterval(function() {
+      this.HAPevent(server.server.split(':')[0], server.server.split(':')[1], JSON.stringify({
+        characteristics: this.eventRegistry[server.server]
+      }), clearTimer);
+    }.bind(this), 60000);
+  }
 
   function clearTimer(err, rsp) {
     if (err) {
-      debug("HAPevent event reregister failed, retry in 60", server, err);
+      debug("HAPevent event reregister failed, retry in 60", server);
     } else {
       debug("HAPevent event reregister succeeded", server);
       clearInterval(reconnectTimer);
     }
   }
 }
+
+HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback) {
+  // console.log("This-0", this);
+  _mdnsLookup(deviceID, function(err, instance) {
+    // debug("This-1", instance);
+    if (err) {
+      callback(err);
+    } else {
+      hapRequest({
+        eventBus: this._eventBus,
+        method: 'PUT',
+        deviceID: deviceID,
+        url: 'http://' + instance.host + ':' + instance.port + '/characteristics',
+        timeout: this.reqTimeout,
+        maxAttempts: 1, // (default) try 5 times
+        headers: {
+          "Content-Type": "Application/json",
+          "authorization": this.pin,
+          "connection": "keep-alive"
+        },
+        body: body
+      }, function(err, response) {
+        // Response s/b 200 OK
+
+        if (err) {
+          debug("Homebridge event reg failed %s:%s", instance.host, instance.port, body, err.message);
+          _mdnsError(deviceID);
+          callback(err);
+        } else if (response.statusCode !== 207 && response.statusCode !== 204) {
+          if (response.statusCode === 401 || response.statusCode === 470) {
+            debug("Homebridge auth failed, invalid PIN %s", this.pin, deviceID, body, err, response.body);
+            _mdnsError(deviceID);
+            callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+          } else {
+            debug("Homebridge event reg failed %s:%s Status: %s ", deviceID, response.statusCode, body, err, response.body);
+            _mdnsError(deviceID);
+            callback(new Error("Homebridge event reg failed"));
+          }
+        } else {
+          var rsp;
+
+          // var key = ipAddress + ':' + port;
+          if (!this.eventRegistry[deviceID]) {
+            this.eventRegistry[deviceID] = [];
+          }
+          // debug("1", JSON.parse(body).characteristics);
+          this.eventRegistry[deviceID] = this.eventRegistry[deviceID].concat(JSON.parse(body).characteristics);
+          // debug("2", JSON.stringify(this.eventRegistry[key]));
+          this.eventRegistry[deviceID].sort((a, b) => (JSON.stringify(a) > JSON.stringify(b)) ? 1 : ((JSON.stringify(b) > JSON.stringify(a)) ? -1 : 0));
+          // debug("3", JSON.stringify(this.eventRegistry[key]));
+          this.eventRegistry[deviceID] = Array.from(new Set(this.eventRegistry[deviceID].map(JSON.stringify))).map(JSON.parse);
+          // debug("4", JSON.stringify(this.eventRegistry[key]));
+          try {
+            rsp = JSON.parse(response.body);
+          } catch (ex) {
+            debug("Homebridge Response Failed %s:%s", deviceID, response.statusCode, response.statusMessage);
+            debug("Homebridge Response Failed %s:%s", deviceID, response.body, ex);
+
+            callback(new Error(ex));
+            return;
+          }
+          callback(null, rsp);
+        }
+      }.bind(this));
+    }
+  }.bind(this));
+};
 
 /**
  * HAPNodeJSClient.prototype.HAPevent - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
@@ -311,6 +438,23 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
   }.bind(this));
 };
 
+HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callback) {
+  // console.log("This-0", this);
+  _mdnsLookup(deviceID, function(err, instance) {
+    // console.log("This-1", this);
+    if (err) {
+      callback(err);
+    } else {
+      HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, body, function(err, response) {
+        if (err) {
+          _mdnsError(deviceID);
+        }
+        callback(err, response);
+      });
+    }
+  }.bind(this));
+};
+
 /**
  * HAPNodeJSClient.prototype.HAPresource - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
  *
@@ -361,6 +505,23 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
       callback(null, rsp);
     }
   });
+};
+
+HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callback) {
+  // console.log("This-0", this);
+  _mdnsLookup(deviceID, function(err, instance) {
+    // console.log("This-1", this);
+    if (err) {
+      callback(err);
+    } else {
+      HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, body, function(err, response) {
+        if (err) {
+          _mdnsError(deviceID);
+        }
+        callback(err, response);
+      });
+    }
+  }.bind(this));
 };
 
 /**
@@ -417,61 +578,65 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
   });
 };
 
-function _getAccessories(ipAddress, instance, callback) {
-  // debug("_getAccessories", 'http://' + ipAddress + ':' + instance.port + '/accessories');
-  request({
-    eventBus: this._eventBus,
-    method: 'GET',
-    url: 'http://' + ipAddress + ':' + instance.port + '/accessories',
-    timeout: this.reqTimeout,
-    maxAttempts: 5, // (default) try 5 times
-    retryDelay: 5000, // (default) wait for 5s before trying again
-    headers: {
-      "Content-Type": "Application/json",
-      "authorization": this.pin,
-      "connection": "keep-alive"
-    }
-  }, function(err, response) {
-    // Response s/b 200 OK
-    // debug("_getAccessories", response);
-    if (err || response.statusCode !== 200) {
-      if (err) {
-        debug("HAP Discover failed %s http://%s:%s error %s", instance.txt.md, ipAddress, instance.port, err.code);
-      } else {
-        // Status code = 401/470 = homebridge not running in insecure mode
-        if (response.statusCode === 401 || response.statusCode === 470) {
-          debug("HAP Discover failed %s http://%s:%s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, ipAddress, instance.port);
-          err = new Error("homebridge is not running in insecure mode with -I", response.statusCode);
+function _getAccessories(instance, callback) {
+  // debug("_getAccessories", instance);
+  if ((this.filter && this.filter === instance.host + ":" + instance.port) || !this.filter) {
+    request({
+      eventBus: this._eventBus,
+      method: 'GET',
+      url: instance.url + '/accessories',
+      timeout: this.reqTimeout,
+      maxAttempts: 5, // (default) try 5 times
+      retryDelay: 5000, // (default) wait for 5s before trying again
+      headers: {
+        "Content-Type": "Application/json",
+        "authorization": this.pin,
+        "connection": "keep-alive"
+      }
+    }, function(err, response) {
+      // Response s/b 200 OK
+      // debug("_getAccessories", response);
+      if (err || response.statusCode !== 200) {
+        if (err) {
+          debug("HAP Discover failed %s -> %s error %s", instance.txt.md, instance.url, err.code);
         } else {
-          debug("HAP Discover failed %s http://%s:%s error code %s", instance.txt.md, ipAddress, instance.port, response.statusCode);
-          // debug("Message", response);
-          err = new Error("Http Err", response.statusCode);
+          // Status code = 401/470 = homebridge not running in insecure mode
+          if (response.statusCode === 401 || response.statusCode === 470) {
+            debug("HAP Discover failed %s -> %s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, instance.url);
+            err = new Error("homebridge is not running in insecure mode with -I", response.statusCode);
+          } else {
+            debug("HAP Discover failed %s -> %s http status code %s", instance.txt.md, instance.url, response.statusCode);
+            // debug("Message", response);
+            err = new Error("Http Err", response.statusCode);
+          }
+        }
+        callback(err);
+      } else {
+        // debug("_getAccessories", response.body);
+        try {
+          var message = normalizeUUID(JSON.parse(response.body.replace(/\uFFFD/g, '')));
+        } catch (err) {
+          debug("HAP Json Msg Parse failed %s %s error code %s", instance.txt.md, instance.url, response.statusCode);
+          callback(err);
+          return;
+        }
+        if (message && Object.keys(message.accessories).length > 0) {
+          debug("Homebridge instance discovered %s with %s accessories", instance.txt.md, Object.keys(message.accessories).length);
+          discovered.push({
+            ipAddress: instance.host,
+            instance: instance,
+            accessories: message,
+            deviceID: instance.deviceID,
+            name: instance.txt.md
+          });
+          callback(null);
+        } else {
+          debug("Short json data received %s -> %s", instance.txt.md, instance.url, JSON.stringify(response));
+          callback(new Error("Short json data received %s -> %s", instance.txt.md, instance.url));
         }
       }
-      callback(err);
-    } else {
-      // debug("_getAccessories", response.body);
-      try {
-        var message = normalizeUUID(JSON.parse(response.body.replace(/\uFFFD/g, '')));
-      } catch (err) {
-        debug("HAP Json Msg Parse failed %s http://%s:%s error code %s", instance.txt.md, ipAddress, instance.port, response.statusCode);
-        callback(err);
-        return;
-      }
-      if (message && Object.keys(message.accessories).length > 0) {
-        callback(null, {
-          "ipAddress": ipAddress,
-          "instance": instance,
-          "accessories": message
-        });
-      } else {
-        debug("Short json data received http://%s:%s", ipAddress, instance.port, JSON.stringify(response));
-        callback(new Error("Short json data received http://%s:%s", ipAddress, instance.port));
-      }
-    }
-  });
-}
-
-function handleError(err) {
-  console.warn(err);
+    });
+  } else {
+    debug("Filtered HAP instance address: %s -> %s", instance.txt.md, instance.url);
+  }
 }
