@@ -12,6 +12,7 @@ var normalizeUUID = require('./lib/util.js').normalizeUUID;
 
 var discovered = [];
 var mdnsCache = [];
+var populateCache = false;
 
 module.exports = {
   HAPNodeJSClient: HAPNodeJSClient
@@ -119,7 +120,7 @@ function _mdnsLookup(deviceID, callback) {
   } else {
     _populateCache(4, null, function() {
       if (mdnsCache[deviceID]) {
-        debug('refreshed', mdnsCache[deviceID].url);
+        // debug('refreshed', mdnsCache[deviceID]);
         callback(null, mdnsCache[deviceID]);
       } else {
         callback(new Error("ERROR: HB Instance not found", deviceID), null);
@@ -133,50 +134,58 @@ function _mdnsError(deviceID) {
   mdnsCache[deviceID] = false;
   _populateCache(4, null, function() {
     if (mdnsCache[deviceID]) {
-      debug('refreshed', mdnsCache[deviceID].url);
+      // debug('refreshed', mdnsCache[deviceID]);
     }
   });
 }
 
 function _populateCache(timeout, discovery, callback) {
-  var browser = bonjour.find({
-    type: 'hap'
-  }, function(result) {
-    if (result.txt) {
-      debug('HAP Device discovered', result.name);
-      var ipAddress, url;
+  // debug("_populateCache", populateCache);
+  if (!populateCache) {
+    populateCache = true;
+    // debug("_populateCache", new Error().stack);
+    var browser = bonjour.find({
+      type: 'hap'
+    }, function(result) {
+      if (result.txt) {
+        debug('HAP Device discovered', result.name);
+        var ipAddress, url;
 
-      for (const address of result.addresses) {
-        if (ip.isV4Format(address) && address.substring(0, 7) !== "169.254") {
-          ipAddress = address;
-          url = "http://" + ipAddress + ":" + result.port;
-          break;
-        } else if (ip.isV6Format(address)) {
-          ipAddress = address;
-          url = "http://[" + ipAddress + "]:" + result.port;
+        for (const address of result.addresses) {
+          if (ip.isV4Format(address) && address.substring(0, 7) !== "169.254") {
+            ipAddress = address;
+            url = "http://" + ipAddress + ":" + result.port;
+            break;
+          } else if (ip.isV6Format(address)) {
+            ipAddress = address;
+            url = "http://[" + ipAddress + "]:" + result.port;
+          }
         }
+        // debug("result", result);
+        mdnsCache[result.txt.id] = {
+          host: ipAddress,
+          port: result.port,
+          url: url,
+          deviceID: result.txt.id,
+          txt: result.txt
+        };
+        // debug("discovery", discovery);
+        if (discovery) {
+          discovery.call(this, mdnsCache[result.txt.id], function() {});
+        }
+      } else {
+        debug("Unsupported device found, skipping", result.name);
       }
-      // debug("result", result);
-      mdnsCache[result.txt.id] = {
-        host: ipAddress,
-        port: result.port,
-        url: url,
-        deviceID: result.txt.id,
-        txt: result.txt
-      };
-      // debug("discovery", discovery);
-      if (discovery) {
-        discovery.call(this, mdnsCache[result.txt.id], function() {});
-      }
-    } else {
-      debug("Unsupported device found, skipping", result.name);
-    }
-  });
-  setTimeout(function() {
-    // debug('Timeout:');
-    browser.stop();
+    });
+    setTimeout(function() {
+      // debug('Timeout:');
+      browser.stop();
+      populateCache = false;
+      callback();
+    }, timeout * 1000);
+  } else {
     callback();
-  }, timeout * 1000);
+  }
 }
 
 /**
@@ -272,17 +281,25 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
  */
 
 function _reconnectServer(server) {
-  debug("HAPevent events Reregister", server, JSON.stringify(this.eventRegistry[server]));
-
-  var reconnectTimer = setInterval(function() {
-    this.HAPevent(server.split(':')[0], server.split(':')[1], JSON.stringify({
-      characteristics: this.eventRegistry[server]
-    }), clearTimer);
-  }.bind(this), 60000);
+  debug("HAPevent events Reregister", server);
+  // debug("This", this, server);
+  if (server.deviceID) {
+    var reconnectTimer = setInterval(function() {
+      this.HAPeventByDeviceID(server.deviceID, JSON.stringify({
+        characteristics: this.eventRegistry[server.deviceID]
+      }), clearTimer);
+    }.bind(this), 60000);
+  } else {
+    var reconnectTimer = setInterval(function() {
+      this.HAPevent(server.server.split(':')[0], server.server.split(':')[1], JSON.stringify({
+        characteristics: this.eventRegistry[server.server]
+      }), clearTimer);
+    }.bind(this), 60000);
+  }
 
   function clearTimer(err, rsp) {
     if (err) {
-      debug("HAPevent event reregister failed, retry in 60", server, err);
+      debug("HAPevent event reregister failed, retry in 60", server);
     } else {
       debug("HAPevent event reregister succeeded", server);
       clearInterval(reconnectTimer);
@@ -293,16 +310,66 @@ function _reconnectServer(server) {
 HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback) {
   // console.log("This-0", this);
   _mdnsLookup(deviceID, function(err, instance) {
-    // console.log("This-1", this);
+    // debug("This-1", instance);
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPevent.call(this, instance.host, instance.port, body, function(err, response) {
+      hapRequest({
+        eventBus: this._eventBus,
+        method: 'PUT',
+        deviceID: deviceID,
+        url: 'http://' + instance.host + ':' + instance.port + '/characteristics',
+        timeout: this.reqTimeout,
+        maxAttempts: 1, // (default) try 5 times
+        headers: {
+          "Content-Type": "Application/json",
+          "authorization": this.pin,
+          "connection": "keep-alive"
+        },
+        body: body
+      }, function(err, response) {
+        // Response s/b 200 OK
+
         if (err) {
+          debug("Homebridge event reg failed %s:%s", instance.host, instance.port, body, err.message);
           _mdnsError(deviceID);
+          callback(err);
+        } else if (response.statusCode !== 207 && response.statusCode !== 204) {
+          if (response.statusCode === 401 || response.statusCode === 470) {
+            debug("Homebridge auth failed, invalid PIN %s", this.pin, deviceID, body, err, response.body);
+            _mdnsError(deviceID);
+            callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+          } else {
+            debug("Homebridge event reg failed %s:%s Status: %s ", deviceID, response.statusCode, body, err, response.body);
+            _mdnsError(deviceID);
+            callback(new Error("Homebridge event reg failed"));
+          }
+        } else {
+          var rsp;
+
+          // var key = ipAddress + ':' + port;
+          if (!this.eventRegistry[deviceID]) {
+            this.eventRegistry[deviceID] = [];
+          }
+          // debug("1", JSON.parse(body).characteristics);
+          this.eventRegistry[deviceID] = this.eventRegistry[deviceID].concat(JSON.parse(body).characteristics);
+          // debug("2", JSON.stringify(this.eventRegistry[key]));
+          this.eventRegistry[deviceID].sort((a, b) => (JSON.stringify(a) > JSON.stringify(b)) ? 1 : ((JSON.stringify(b) > JSON.stringify(a)) ? -1 : 0));
+          // debug("3", JSON.stringify(this.eventRegistry[key]));
+          this.eventRegistry[deviceID] = Array.from(new Set(this.eventRegistry[deviceID].map(JSON.stringify))).map(JSON.parse);
+          // debug("4", JSON.stringify(this.eventRegistry[key]));
+          try {
+            rsp = JSON.parse(response.body);
+          } catch (ex) {
+            debug("Homebridge Response Failed %s:%s", deviceID, response.statusCode, response.statusMessage);
+            debug("Homebridge Response Failed %s:%s", deviceID, response.body, ex);
+
+            callback(new Error(ex));
+            return;
+          }
+          callback(null, rsp);
         }
-        callback(err, response);
-      });
+      }.bind(this));
     }
   }.bind(this));
 };

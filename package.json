@@ -15,7 +15,7 @@
     "documentation": "11.0.0"
   },
   "dependencies": {
-    "bonjour-hap": ">=3.5.5",
+    "bonjour-hap": ">=3.5.7",
     "debug": ">2.6.9",
     "ip": ">=1.1.5",
     "once": ">=1.4.0",
