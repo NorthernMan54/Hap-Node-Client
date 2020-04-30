@@ -83,6 +83,7 @@ function HAPNodeJSClient(options) {
      * @Type  {object}
      * @property {string} host - IP Address of homebridge instance generating event
      * @property {number} port - Port of homebridge instance generating event
+     * @property {number} deviceID - deviceID of homebridge instance generating event
      * @property {number} aid - Accessory ID of accessory generating event
      * @property {number} iid - Instance ID of accessory characteristic generating event
      * @property {object} value - Updated characteristic value
@@ -204,6 +205,14 @@ HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
 // curl -X PUT http://127.0.0.1:51826/characteristics --header "Content-Type:Application/json"
 // --header "authorization: 031-45-154" --data "{ \"characteristics\": [{ \"aid\": 2, \"iid\": 9, \"value\": 0}] }"
 
+/**
+ * HAPNodeJSClient.prototype.HAPcontrolByDeviceID - Send a characteristic PUT Message to a particular homebridge instance
+ *
+ * @param  {type} deviceID  deviceID of homebridge instance
+ * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+ * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
+ */
+
 HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callback) {
   _mdnsLookup(deviceID, function(err, instance) {
     if (err) {
@@ -306,6 +315,14 @@ function _reconnectServer(server) {
     }
   }
 }
+
+/**
+ * HAPNodeJSClient.prototype.HAPeventByDeviceID - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
+ *
+ * @param  {type} deviceID  deviceID homebridge instance
+ * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+ * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
+ */
 
 HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback) {
   // console.log("This-0", this);
@@ -438,6 +455,14 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
   }.bind(this));
 };
 
+/**
+ * HAPNodeJSClient.prototype.HAPresourceByDeviceID - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
+ *
+ * @param  {type} DeviceID  DeviceID of homebridge instance
+ * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+ * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
+ */
+
 HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callback) {
   // console.log("This-0", this);
   _mdnsLookup(deviceID, function(err, instance) {
@@ -506,6 +531,14 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     }
   });
 };
+
+/**
+ * HAPNodeJSClient.prototype.HAPstatusByDeviceID - Get current status for characteristics
+ *
+ * @param  {type} deviceID  deviceID of homebridge instance
+ * @param  {type} body      description
+ * @param  {type} callback  Callback to execute upon completion of characteristic getting, function(err, response)
+ */
 
 HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callback) {
   // console.log("This-0", this);

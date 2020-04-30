@@ -7,24 +7,33 @@
     -   [Properties][3]
     -   [HAPaccessories][4]
         -   [Parameters][5]
-    -   [HAPcontrol][6]
+    -   [HAPcontrolByDeviceID][6]
         -   [Parameters][7]
-    -   [HAPevent][8]
+    -   [HAPcontrol][8]
         -   [Parameters][9]
-    -   [HAPresource][10]
+    -   [HAPeventByDeviceID][10]
         -   [Parameters][11]
-    -   [HAPstatus][12]
+    -   [HAPevent][12]
         -   [Parameters][13]
--   [HAPNodeJSClient#Disconnected][14]
-    -   [Properties][15]
-    -   [Examples][16]
--   [HAPNodeJSClient#hapEvent][17]
-    -   [Properties][18]
-    -   [Examples][19]
--   [\_reconnectServer][20]
-    -   [Parameters][21]
--   [Request][22]
-    -   [Parameters][23]
+    -   [HAPresourceByDeviceID][14]
+        -   [Parameters][15]
+    -   [HAPresource][16]
+        -   [Parameters][17]
+    -   [HAPstatusByDeviceID][18]
+        -   [Parameters][19]
+    -   [HAPstatus][20]
+        -   [Parameters][21]
+-   [HAPNodeJSClient#Disconnected][22]
+    -   [Properties][23]
+    -   [Examples][24]
+-   [HAPNodeJSClient#hapEvent][25]
+    -   [Properties][26]
+    -   [Examples][27]
+-   [\_reconnectServer][28]
+    -   [Parameters][29]
+-   [services][30]
+-   [Request][31]
+    -   [Parameters][32]
 
 ## HAPNodeJSClient
 
@@ -38,10 +47,11 @@ Events
 
 ### Properties
 
--   `debug` **[boolean][24]** Enable debug logging, defaults to false
--   `pin` **[string][25]** Homebridge PIN, defaults to '031-45-154'
--   `refresh` **[number][26]** Discovery refresh, defaults to 15 minutes
--   `timeout` **[number][26]** Discovery timeout, defaults to 20 seconds
+-   `debug` **[boolean][33]** Enable debug logging, defaults to false
+-   `pin` **[string][34]** Homebridge PIN, defaults to '031-45-154'
+-   `refresh` **[number][35]** Discovery refresh, defaults to 15 minutes
+-   `timeout` **[number][35]** Discovery timeout, defaults to 20 seconds
+-   `reqTimeout` **[number][35]** Accessory request timeout, defaults to 7 seconds
 
 ### HAPaccessories
 
@@ -53,6 +63,16 @@ HAPNodeJSClient.prototype.HAPaccessories - Returns an array of all homebridge in
 
 Returns **type** description
 
+### HAPcontrolByDeviceID
+
+HAPNodeJSClient.prototype.HAPcontrolByDeviceID - Send a characteristic PUT Message to a particular homebridge instance
+
+#### Parameters
+
+-   `deviceID` **type** deviceID of homebridge instance
+-   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+-   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
+
 ### HAPcontrol
 
 HAPNodeJSClient.prototype.HAPcontrol - Send a characteristic PUT Message to a particular homebridge instance
@@ -61,6 +81,16 @@ HAPNodeJSClient.prototype.HAPcontrol - Send a characteristic PUT Message to a pa
 
 -   `ipAddress` **type** IP Address of homebridge instance
 -   `port` **type** Port of homebridge instance
+-   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+-   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
+
+### HAPeventByDeviceID
+
+HAPNodeJSClient.prototype.HAPeventByDeviceID - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
+
+#### Parameters
+
+-   `deviceID` **type** deviceID homebridge instance
 -   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
 -   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
 
@@ -75,6 +105,17 @@ HAPNodeJSClient.prototype.HAPevent - Send a characteristic PUT Message to a part
 -   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
 -   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
 
+### HAPresourceByDeviceID
+
+HAPNodeJSClient.prototype.HAPresourceByDeviceID - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
+
+#### Parameters
+
+-   `deviceID`  
+-   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
+-   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
+-   `DeviceID` **type** DeviceID of homebridge instance
+
 ### HAPresource
 
 HAPNodeJSClient.prototype.HAPresource - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
@@ -85,6 +126,16 @@ HAPNodeJSClient.prototype.HAPresource - Send a characteristic PUT Message to a p
 -   `port` **type** Port of homebridge instance
 -   `body` **type** An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
 -   `callback` **type** Callback to execute upon completion of characteristic setting, function(err, response)
+
+### HAPstatusByDeviceID
+
+HAPNodeJSClient.prototype.HAPstatusByDeviceID - Get current status for characteristics
+
+#### Parameters
+
+-   `deviceID` **type** deviceID of homebridge instance
+-   `body` **type** description
+-   `callback` **type** Callback to execute upon completion of characteristic getting, function(err, response)
 
 ### HAPstatus
 
@@ -103,7 +154,7 @@ HomeKit Accessory Characteristic event pass thru
 
 ### Properties
 
--   `server` **[string][25]** IP Address and port of disconnected homebridge
+-   `server` **[string][34]** IP Address and port of disconnected homebridge
 
 ### Examples
 
@@ -119,11 +170,12 @@ HomeKit Accessory Characteristic event pass thru
 
 ### Properties
 
--   `host` **[string][25]** IP Address of homebridge instance generating event
--   `port` **[number][26]** Port of homebridge instance generating event
--   `aid` **[number][26]** Accessory ID of accessory generating event
--   `iid` **[number][26]** Instance ID of accessory characteristic generating event
--   `value` **[object][27]** Updated characteristic value
+-   `host` **[string][34]** IP Address of homebridge instance generating event
+-   `port` **[number][35]** Port of homebridge instance generating event
+-   `deviceID` **[number][35]** deviceID of homebridge instance generating event
+-   `aid` **[number][35]** Accessory ID of accessory generating event
+-   `iid` **[number][35]** Instance ID of accessory characteristic generating event
+-   `value` **[object][36]** Updated characteristic value
 
 ### Examples
 
@@ -142,6 +194,10 @@ Sample Message
 -   `server` **type** IP Address and port of disconnected homebridge server
 
 Returns **type** description
+
+## services
+
+Ensure UUIDs are long form
 
 ## Request
 
@@ -165,46 +221,64 @@ Returns **type** description
 
 [5]: #parameters-1
 
-[6]: #hapcontrol
+[6]: #hapcontrolbydeviceid
 
 [7]: #parameters-2
 
-[8]: #hapevent
+[8]: #hapcontrol
 
 [9]: #parameters-3
 
-[10]: #hapresource
+[10]: #hapeventbydeviceid
 
 [11]: #parameters-4
 
-[12]: #hapstatus
+[12]: #hapevent
 
 [13]: #parameters-5
 
-[14]: #hapnodejsclientdisconnected
+[14]: #hapresourcebydeviceid
 
-[15]: #properties-1
+[15]: #parameters-6
 
-[16]: #examples
+[16]: #hapresource
 
-[17]: #hapnodejsclienthapevent
+[17]: #parameters-7
 
-[18]: #properties-2
+[18]: #hapstatusbydeviceid
 
-[19]: #examples-1
+[19]: #parameters-8
 
-[20]: #_reconnectserver
+[20]: #hapstatus
 
-[21]: #parameters-6
+[21]: #parameters-9
 
-[22]: #request
+[22]: #hapnodejsclientdisconnected
 
-[23]: #parameters-7
+[23]: #properties-1
 
-[24]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[24]: #examples
 
-[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[25]: #hapnodejsclienthapevent
 
-[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[26]: #properties-2
 
-[27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[27]: #examples-1
+
+[28]: #_reconnectserver
+
+[29]: #parameters-10
+
+[30]: #services
+
+[31]: #request
+
+[32]: #parameters-11
+
+[33]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[34]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[35]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
