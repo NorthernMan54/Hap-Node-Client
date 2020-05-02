@@ -170,6 +170,7 @@ function _populateCache(timeout, discovery, callback) {
           deviceID: result.txt.id,
           txt: result.txt
         };
+        debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
         // debug("discovery", discovery);
         if (discovery) {
           discovery.call(this, mdnsCache[result.txt.id], function() {});
@@ -631,7 +632,7 @@ function _getAccessories(instance, callback) {
       // debug("_getAccessories", response);
       if (err || response.statusCode !== 200) {
         if (err) {
-          debug("HAP Discover failed %s -> %s error %s", instance.txt.md, instance.url, err.code);
+          debug("HAP Discover failed %s -> %s error %s", instance.txt.md, instance.url, err);
         } else {
           // Status code = 401/470 = homebridge not running in insecure mode
           if (response.statusCode === 401 || response.statusCode === 470) {
