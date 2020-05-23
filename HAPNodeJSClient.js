@@ -280,7 +280,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
       }
       callback(null, rsp);
     }
-  });
+  }.bind(this));
 };
 
 /**
@@ -530,7 +530,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
       }
       callback(null, rsp);
     }
-  });
+  }.bind(this));
 };
 
 /**
@@ -609,7 +609,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
       // debug("HAPStatus callback", rsp);
       callback(null, rsp);
     }
-  });
+  }.bind(this));
 };
 
 function _getAccessories(instance, callback) {
