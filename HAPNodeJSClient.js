@@ -10,6 +10,8 @@ var bonjour = require('bonjour-hap')();
 var ip = require('ip');
 var normalizeUUID = require('./lib/util.js').normalizeUUID;
 
+var reconnectTimer = { byIp: {}, byDevice: {} };
+
 var discovered = [];
 var mdnsCache = [];
 var pinCache = { byIp: {}, byDevice: {} };
@@ -300,28 +302,46 @@ function _reconnectServer(server) {
   debug('HAPevent events Reregister', server);
   // debug('This', this, server);
 
-  var reconnectTimer;
   if (server.deviceID) {
-    reconnectTimer = setInterval(function() {
-      this.HAPeventByDeviceID(server.deviceID, JSON.stringify({
+    if (reconnectTimer.byDevice.hasOwnProperty(server.deviceId)) {
+      clearInterval(reconnectTimer.byDevice[server.deviceId]);
+    }
+
+    reconnectTimer.byDevice[server.deviceId] = setInterval(function() {
+      this.HAPeventByDeviceID(server.deviceID, pinCache.byDevice[server.deviceID], JSON.stringify({
         characteristics: this.eventRegistry[server.deviceID]
-      }), clearTimer);
+      }), function(err, rsp) {
+        if (err) {
+          debug('HAPevent event reregister failed, retry in 60', server);
+        } else {
+          debug('HAPevent event reregister succeeded', server);
+          clearInterval(reconnectTimer.byDevice[server.deviceId]);
+          delete reconnectTimer.byDevice[server.deviceId];
+        }
+      });
     }.bind(this), 60000);
   } else {
-    reconnectTimer = setInterval(function() {
-      this.HAPevent(server.server.split(':')[0], server.server.split(':')[1], JSON.stringify({
-        characteristics: this.eventRegistry[server.server]
-      }), clearTimer);
-    }.bind(this), 60000);
-  }
+    var ipAddress = server.server.split(':')[0];
+    var port = server.server.split(':')[1];
+    var key = ipAddress + ':' + port;
 
-  function clearTimer(err, rsp) {
-    if (err) {
-      debug('HAPevent event reregister failed, retry in 60', server);
-    } else {
-      debug('HAPevent event reregister succeeded', server);
-      clearInterval(reconnectTimer);
+    if (reconnectTimer.byIp.hasOwnProperty(key)) {
+      clearInterval(reconnectTimer.byIp[key]);
     }
+
+    reconnectTimer.byIp[key] = setInterval(function() {
+      this.HAPevent(ipAddress, port, pinCache.byIp[key], JSON.stringify({
+        characteristics: this.eventRegistry[server.server]
+      }), function(err, rsp) {
+        if (err) {
+          debug('HAPevent event reregister failed, retry in 60', server);
+        } else {
+          debug('HAPevent event reregister succeeded', server);
+          clearInterval(reconnectTimer.byIp[key]);
+          delete reconnectTimer.byIp[key];
+        }
+      });
+    }.bind(this), 60000);
   }
 }
 
