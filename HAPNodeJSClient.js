@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var request = require('requestretry');
 // var request = require('./lib/hapRequest.js');
@@ -36,24 +36,24 @@ module.exports = {
  */
 
 function HAPNodeJSClient(options) {
-  // console.log("Options", options);
-  this.debug = options['debug'] || false;
-  this.refresh = options['refresh'] || 900;
-  this.timeout = options['timeout'] || 20;
-  this.reqTimeout = options['reqTimeout'] || 7000;
-  this.pin = options['pin'] || '031-45-154';
-  this.filter = options['filter'] || false;
+  // console.log('Options', options);
+  this.debug = options.debug || false;
+  this.refresh = options.refresh || 900;
+  this.timeout = options.timeout || 20;
+  this.reqTimeout = options.reqTimeout || 7000;
+  this.pin = options.pin || '031-45-154';
+  this.filter = options.filter || false;
   if (this.debug) {
     let debugEnable = require('debug');
     let namespaces = debugEnable.disable();
 
-    // this.log("DEBUG-1", namespaces);
+    // this.log('DEBUG-1', namespaces);
     if (namespaces) {
       namespaces = namespaces + ',hap*';
     } else {
       namespaces = 'hap*';
     }
-    // this.log("DEBUG-2", namespaces);
+    // this.log('DEBUG-2', namespaces);
     debugEnable.enable(namespaces);
   }
   this.eventRegistry = [];
@@ -98,23 +98,23 @@ function HAPNodeJSClient(options) {
       this.emit(event.host + event.port + event.aid + event.iid, event);
     }.bind(this));
   }.bind(this));
-  // debug("This", this);
+  // debug('This', this);
 }
 
 inherits(HAPNodeJSClient, EventEmitter);
 
 function _discovery() {
-  debug("Starting Homebridge instance discovery");
+  debug('Starting Homebridge instance discovery');
   discovered = [];
-  // debug("this-0", this);
+  // debug('this-0', this);
   _populateCache(this.timeout, _getAccessories, function() {
-    debug("Ready");
+    debug('Ready');
     this.emit('Ready', discovered);
   }.bind(this));
 }
 
 function _mdnsLookup(deviceID, callback) {
-  // debug("\nmdnsLookup start", serviceName);
+  // debug('\nmdnsLookup start', serviceName);
   if (mdnsCache[deviceID]) {
     // debug('cached', mdnsCache[serviceName].url);
     callback(null, mdnsCache[deviceID]);
@@ -124,14 +124,14 @@ function _mdnsLookup(deviceID, callback) {
         // debug('refreshed', mdnsCache[deviceID]);
         callback(null, mdnsCache[deviceID]);
       } else {
-        callback(new Error("ERROR: HB Instance not found", deviceID), null);
+        callback(new Error('ERROR: HB Instance not found', deviceID), null);
       }
     });
   }
 }
 
 function _mdnsError(deviceID) {
-  // debug("\_mdnsError ", deviceID);
+  // debug('\_mdnsError ', deviceID);
   mdnsCache[deviceID] = false;
   _populateCache(4, null, function() {
     if (mdnsCache[deviceID]) {
@@ -141,10 +141,10 @@ function _mdnsError(deviceID) {
 }
 
 function _populateCache(timeout, discovery, callback) {
-  // debug("_populateCache", populateCache);
+  // debug('_populateCache', populateCache);
   if (!populateCache) {
     populateCache = true;
-    // debug("_populateCache", new Error().stack);
+    // debug('_populateCache', new Error().stack);
     var browser = bonjour.find({
       type: 'hap'
     }, function(result) {
@@ -153,16 +153,16 @@ function _populateCache(timeout, discovery, callback) {
         var ipAddress, url;
 
         for (const address of result.addresses) {
-          if (ip.isV4Format(address) && address.substring(0, 7) !== "169.254") {
+          if (ip.isV4Format(address) && address.substring(0, 7) !== '169.254') {
             ipAddress = address;
-            url = "http://" + ipAddress + ":" + result.port;
+            url = 'http://' + ipAddress + ':' + result.port;
             break;
           } else if (ip.isV6Format(address)) {
             ipAddress = address;
-            url = "http://[" + ipAddress + "]:" + result.port;
+            url = 'http://[' + ipAddress + ']:' + result.port;
           }
         }
-        // debug("result", result);
+        // debug('result', result);
         mdnsCache[result.txt.id] = {
           host: ipAddress,
           port: result.port,
@@ -171,12 +171,12 @@ function _populateCache(timeout, discovery, callback) {
           txt: result.txt
         };
         debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
-        // debug("discovery", discovery);
+        // debug('discovery', discovery);
         if (discovery) {
           discovery.call(this, mdnsCache[result.txt.id], function() {});
         }
       } else {
-        debug("Unsupported device found, skipping", result.name);
+        debug('Unsupported device found, skipping', result.name);
       }
     });
     setTimeout(function() {
@@ -246,24 +246,24 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
     timeout: this.reqTimeout,
     maxAttempts: 1, // (default) try 5 times
     headers: {
-      "Content-Type": "Application/json",
-      "authorization": this.pin,
-      "connection": "keep-alive"
+      'Content-Type': 'Application/json',
+      'authorization': this.pin,
+      'connection': 'keep-alive'
     },
     body: body
   }, function(err, response) {
     // Response s/b 200 OK
 
     if (err) {
-      debug("Homebridge Control failed %s:%s", ipAddress, port, body, err.message);
+      debug('Homebridge Control failed %s:%s', ipAddress, port, body, err.message);
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
       } else {
-        debug("Homebridge Control failed %s:%s Status: %s ", ipAddress, port, response.statusCode, body, err, response.body);
-        callback(new Error("Homebridge control failed"));
+        debug('Homebridge Control failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
+        callback(new Error('Homebridge control failed'));
       }
     } else {
       var rsp;
@@ -271,8 +271,8 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
         try {
           rsp = JSON.parse(response.body);
         } catch (ex) {
-          debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
-          debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
+          debug('Homebridge Response Failed %s:%s', ipAddress, port, response.statusCode, response.statusMessage);
+          debug('Homebridge Response Failed %s:%s', ipAddress, port, response.body, ex);
 
           callback(new Error(ex));
           return;
@@ -291,16 +291,18 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
  */
 
 function _reconnectServer(server) {
-  debug("HAPevent events Reregister", server);
-  // debug("This", this, server);
+  debug('HAPevent events Reregister', server);
+  // debug('This', this, server);
+
+  var reconnectTimer;
   if (server.deviceID) {
-    var reconnectTimer = setInterval(function() {
+    reconnectTimer = setInterval(function() {
       this.HAPeventByDeviceID(server.deviceID, JSON.stringify({
         characteristics: this.eventRegistry[server.deviceID]
       }), clearTimer);
     }.bind(this), 60000);
   } else {
-    var reconnectTimer = setInterval(function() {
+    reconnectTimer = setInterval(function() {
       this.HAPevent(server.server.split(':')[0], server.server.split(':')[1], JSON.stringify({
         characteristics: this.eventRegistry[server.server]
       }), clearTimer);
@@ -309,9 +311,9 @@ function _reconnectServer(server) {
 
   function clearTimer(err, rsp) {
     if (err) {
-      debug("HAPevent event reregister failed, retry in 60", server);
+      debug('HAPevent event reregister failed, retry in 60', server);
     } else {
-      debug("HAPevent event reregister succeeded", server);
+      debug('HAPevent event reregister succeeded', server);
       clearInterval(reconnectTimer);
     }
   }
@@ -326,9 +328,9 @@ function _reconnectServer(server) {
  */
 
 HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback) {
-  // console.log("This-0", this);
+  // console.log('This-0', this);
   _mdnsLookup(deviceID, function(err, instance) {
-    // debug("This-1", instance);
+    // debug('This-1', instance);
     if (err) {
       callback(err);
     } else {
@@ -340,27 +342,27 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
         timeout: this.reqTimeout,
         maxAttempts: 1, // (default) try 5 times
         headers: {
-          "Content-Type": "Application/json",
-          "authorization": this.pin,
-          "connection": "keep-alive"
+          'Content-Type': 'Application/json',
+          'authorization': this.pin,
+          'connection': 'keep-alive'
         },
         body: body
       }, function(err, response) {
         // Response s/b 200 OK
 
         if (err) {
-          debug("Homebridge event reg failed %s:%s", instance.host, instance.port, body, err.message);
+          debug('Homebridge event reg failed %s:%s', instance.host, instance.port, body, err.message);
           _mdnsError(deviceID);
           callback(err);
         } else if (response.statusCode !== 207 && response.statusCode !== 204) {
           if (response.statusCode === 401 || response.statusCode === 470) {
-            debug("Homebridge auth failed, invalid PIN %s", this.pin, deviceID, body, err, response.body);
+            debug('Homebridge auth failed, invalid PIN %s', this.pin, deviceID, body, err, response.body);
             _mdnsError(deviceID);
-            callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+            callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
           } else {
-            debug("Homebridge event reg failed %s:%s Status: %s ", deviceID, response.statusCode, body, err, response.body);
+            debug('Homebridge event reg failed %s:%s Status: %s ', deviceID, response.statusCode, body, err, response.body);
             _mdnsError(deviceID);
-            callback(new Error("Homebridge event reg failed"));
+            callback(new Error('Homebridge event reg failed'));
           }
         } else {
           var rsp;
@@ -369,18 +371,18 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
           if (!this.eventRegistry[deviceID]) {
             this.eventRegistry[deviceID] = [];
           }
-          // debug("1", JSON.parse(body).characteristics);
+          // debug('1', JSON.parse(body).characteristics);
           this.eventRegistry[deviceID] = this.eventRegistry[deviceID].concat(JSON.parse(body).characteristics);
-          // debug("2", JSON.stringify(this.eventRegistry[key]));
+          // debug('2', JSON.stringify(this.eventRegistry[key]));
           this.eventRegistry[deviceID].sort((a, b) => (JSON.stringify(a) > JSON.stringify(b)) ? 1 : ((JSON.stringify(b) > JSON.stringify(a)) ? -1 : 0));
-          // debug("3", JSON.stringify(this.eventRegistry[key]));
+          // debug('3', JSON.stringify(this.eventRegistry[key]));
           this.eventRegistry[deviceID] = Array.from(new Set(this.eventRegistry[deviceID].map(JSON.stringify))).map(JSON.parse);
-          // debug("4", JSON.stringify(this.eventRegistry[key]));
+          // debug('4', JSON.stringify(this.eventRegistry[key]));
           try {
             rsp = JSON.parse(response.body);
           } catch (ex) {
-            debug("Homebridge Response Failed %s:%s", deviceID, response.statusCode, response.statusMessage);
-            debug("Homebridge Response Failed %s:%s", deviceID, response.body, ex);
+            debug('Homebridge Response Failed %s:%s', deviceID, response.statusCode, response.statusMessage);
+            debug('Homebridge Response Failed %s:%s', deviceID, response.body, ex);
 
             callback(new Error(ex));
             return;
@@ -409,24 +411,24 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
     timeout: this.reqTimeout,
     maxAttempts: 1, // (default) try 5 times
     headers: {
-      "Content-Type": "Application/json",
-      "authorization": this.pin,
-      "connection": "keep-alive"
+      'Content-Type': 'Application/json',
+      'authorization': this.pin,
+      'connection': 'keep-alive'
     },
     body: body
   }, function(err, response) {
     // Response s/b 200 OK
 
     if (err) {
-      debug("Homebridge event reg failed %s:%s", ipAddress, port, body, err.message);
+      debug('Homebridge event reg failed %s:%s', ipAddress, port, body, err.message);
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
       } else {
-        debug("Homebridge event reg failed %s:%s Status: %s ", ipAddress, port, response.statusCode, body, err, response.body);
-        callback(new Error("Homebridge event reg failed"));
+        debug('Homebridge event reg failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
+        callback(new Error('Homebridge event reg failed'));
       }
     } else {
       var rsp;
@@ -435,18 +437,18 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
       if (!this.eventRegistry[key]) {
         this.eventRegistry[key] = [];
       }
-      // debug("1", JSON.parse(body).characteristics);
+      // debug('1', JSON.parse(body).characteristics);
       this.eventRegistry[key] = this.eventRegistry[key].concat(JSON.parse(body).characteristics);
-      // debug("2", JSON.stringify(this.eventRegistry[key]));
+      // debug('2', JSON.stringify(this.eventRegistry[key]));
       this.eventRegistry[key].sort((a, b) => (JSON.stringify(a) > JSON.stringify(b)) ? 1 : ((JSON.stringify(b) > JSON.stringify(a)) ? -1 : 0));
-      // debug("3", JSON.stringify(this.eventRegistry[key]));
+      // debug('3', JSON.stringify(this.eventRegistry[key]));
       this.eventRegistry[key] = Array.from(new Set(this.eventRegistry[key].map(JSON.stringify))).map(JSON.parse);
-      // debug("4", JSON.stringify(this.eventRegistry[key]));
+      // debug('4', JSON.stringify(this.eventRegistry[key]));
       try {
         rsp = JSON.parse(response.body);
       } catch (ex) {
-        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
-        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
+        debug('Homebridge Response Failed %s:%s', ipAddress, port, response.statusCode, response.statusMessage);
+        debug('Homebridge Response Failed %s:%s', ipAddress, port, response.body, ex);
 
         callback(new Error(ex));
         return;
@@ -465,9 +467,9 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
  */
 
 HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callback) {
-  // console.log("This-0", this);
+  // console.log('This-0', this);
   _mdnsLookup(deviceID, function(err, instance) {
-    // console.log("This-1", this);
+    // console.log('This-1', this);
     if (err) {
       callback(err);
     } else {
@@ -498,32 +500,32 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     timeout: this.reqTimeout,
     maxAttempts: 1, // (default) try 5 times
     headers: {
-      "Content-Type": "Application/json",
-      "authorization": this.pin,
-      "connection": "keep-alive"
+      'Content-Type': 'Application/json',
+      'authorization': this.pin,
+      'connection': 'keep-alive'
     },
     body: body
   }, function(err, response) {
     // Response s/b 200 OK
 
     if (err) {
-      //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
+      //      debug('Homebridge Status failed %s:%s', ipAddress, port, body, err);
       callback(err);
     } else if (response.statusCode !== 200) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err);
-        callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
       } else {
-        debug("Homebridge Status failed %s:%s Status: %s ", ipAddress, port, response.statusCode, body, err);
-        callback(new Error("Homebridge status failed"));
+        debug('Homebridge Status failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err);
+        callback(new Error('Homebridge status failed'));
       }
     } else {
       var rsp;
       try {
         rsp = response.body;
       } catch (ex) {
-        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
-        debug("Homebridge Response Failed %s:%s", ipAddress, port, ex);
+        debug('Homebridge Response Failed %s:%s', ipAddress, port, response.statusCode, response.statusMessage);
+        debug('Homebridge Response Failed %s:%s', ipAddress, port, ex);
 
         callback(new Error(ex));
         return;
@@ -542,9 +544,9 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
  */
 
 HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callback) {
-  // console.log("This-0", this);
+  // console.log('This-0', this);
   _mdnsLookup(deviceID, function(err, instance) {
-    // console.log("This-1", this);
+    // console.log('This-1', this);
     if (err) {
       callback(err);
     } else {
@@ -568,7 +570,7 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callbac
  */
 
 HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
-  // debug("HAPstatus", this.pin);
+  // debug('HAPstatus', this.pin);
   request({
     eventBus: this._eventBus,
     method: 'GET',
@@ -576,45 +578,45 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
     timeout: this.reqTimeout,
     maxAttempts: 1, // (default) try 5 times
     headers: {
-      "Content-Type": "Application/json",
-      "authorization": this.pin,
-      "connection": "keep-alive"
+      'Content-Type': 'Application/json',
+      'authorization': this.pin,
+      'connection': 'keep-alive'
     }
   }, function(err, response) {
     // Response s/b 200 OK
-    // debug("HAPstatus", 'http://' + ipAddress + ':' + port + '/characteristics' + body);
-    // debug("HAPstatus-1", this.pin);
+    // debug('HAPstatus', 'http://' + ipAddress + ':' + port + '/characteristics' + body);
+    // debug('HAPstatus-1', this.pin);
     if (err) {
-      //      debug("Homebridge Status failed %s:%s", ipAddress, port, body, err);
+      //      debug('Homebridge Status failed %s:%s', ipAddress, port, body, err);
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 200) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug("Homebridge auth failed, invalid PIN %s %s:%s", this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error("Homebridge auth failed, invalid PIN " + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
       } else {
-        debug("Homebridge Status failed %s:%s Status: %s ", ipAddress, port, response.statusCode, body, err, response.body);
-        callback(new Error("Homebridge status failed"));
+        debug('Homebridge Status failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
+        callback(new Error('Homebridge status failed'));
       }
     } else {
       var rsp;
       try {
         rsp = JSON.parse(response.body);
       } catch (ex) {
-        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.statusCode, response.statusMessage);
-        debug("Homebridge Response Failed %s:%s", ipAddress, port, response.body, ex);
+        debug('Homebridge Response Failed %s:%s', ipAddress, port, response.statusCode, response.statusMessage);
+        debug('Homebridge Response Failed %s:%s', ipAddress, port, response.body, ex);
 
         callback(new Error(ex));
         return;
       }
-      // debug("HAPStatus callback", rsp);
+      // debug('HAPStatus callback', rsp);
       callback(null, rsp);
     }
   }.bind(this));
 };
 
 function _getAccessories(instance, callback) {
-  // debug("_getAccessories", instance);
-  if ((this.filter && this.filter === instance.host + ":" + instance.port) || !this.filter) {
+  // debug('_getAccessories', instance);
+  if ((this.filter && this.filter === instance.host + ':' + instance.port) || !this.filter) {
     request({
       eventBus: this._eventBus,
       method: 'GET',
@@ -623,39 +625,39 @@ function _getAccessories(instance, callback) {
       maxAttempts: 5, // (default) try 5 times
       retryDelay: 5000, // (default) wait for 5s before trying again
       headers: {
-        "Content-Type": "Application/json",
-        "authorization": this.pin,
-        "connection": "keep-alive"
+        'Content-Type': 'Application/json',
+        'authorization': this.pin,
+        'connection': 'keep-alive'
       }
     }, function(err, response) {
       // Response s/b 200 OK
-      // debug("_getAccessories", response);
+      // debug('_getAccessories', response);
       if (err || response.statusCode !== 200) {
         if (err) {
-          debug("HAP Discover failed %s -> %s error %s", instance.txt.md, instance.url, err);
+          debug('HAP Discover failed %s -> %s error %s', instance.txt.md, instance.url, err);
         } else {
           // Status code = 401/470 = homebridge not running in insecure mode
           if (response.statusCode === 401 || response.statusCode === 470) {
-            debug("HAP Discover failed %s -> %s invalid PIN or homebridge is not running in insecure mode with -I", instance.txt.md, instance.url);
-            err = new Error("homebridge is not running in insecure mode with -I", response.statusCode);
+            debug('HAP Discover failed %s -> %s invalid PIN or homebridge is not running in insecure mode with -I', instance.txt.md, instance.url);
+            err = new Error('homebridge is not running in insecure mode with -I', response.statusCode);
           } else {
-            debug("HAP Discover failed %s -> %s http status code %s", instance.txt.md, instance.url, response.statusCode);
-            // debug("Message", response);
-            err = new Error("Http Err", response.statusCode);
+            debug('HAP Discover failed %s -> %s http status code %s', instance.txt.md, instance.url, response.statusCode);
+            // debug('Message', response);
+            err = new Error('Http Err', response.statusCode);
           }
         }
         callback(err);
       } else {
-        // debug("_getAccessories", response.body);
+        // debug('_getAccessories', response.body);
         try {
           var message = normalizeUUID(JSON.parse(response.body.replace(/\uFFFD/g, '')));
         } catch (err) {
-          debug("HAP Json Msg Parse failed %s %s error code %s", instance.txt.md, instance.url, response.statusCode);
+          debug('HAP Json Msg Parse failed %s %s error code %s', instance.txt.md, instance.url, response.statusCode);
           callback(err);
           return;
         }
         if (message && Object.keys(message.accessories).length > 0) {
-          debug("Homebridge instance discovered %s with %s accessories", instance.txt.md, Object.keys(message.accessories).length);
+          debug('Homebridge instance discovered %s with %s accessories', instance.txt.md, Object.keys(message.accessories).length);
           discovered.push({
             ipAddress: instance.host,
             instance: instance,
@@ -665,12 +667,12 @@ function _getAccessories(instance, callback) {
           });
           callback(null);
         } else {
-          debug("Short json data received %s -> %s", instance.txt.md, instance.url, JSON.stringify(response));
-          callback(new Error("Short json data received %s -> %s", instance.txt.md, instance.url));
+          debug('Short json data received %s -> %s', instance.txt.md, instance.url, JSON.stringify(response));
+          callback(new Error('Short json data received %s -> %s', instance.txt.md, instance.url));
         }
       }
     });
   } else {
-    debug("Filtered HAP instance address: %s -> %s", instance.txt.md, instance.url);
+    debug('Filtered HAP instance address: %s -> %s', instance.txt.md, instance.url);
   }
 }
