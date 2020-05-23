@@ -56,7 +56,7 @@ function HAPNodeJSClient(options) {
     // this.log('DEBUG-2', namespaces);
     debugEnable.enable(namespaces);
   }
-  this.eventRegistry = [];
+  this.eventRegistry = {};
   _discovery.call(this);
   this._eventBus = new EventEmitter();
   setInterval(_discovery.bind(this), this.refresh * 1000);
