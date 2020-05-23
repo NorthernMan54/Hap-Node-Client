@@ -626,7 +626,6 @@ function _getAccessories(instance, callback) {
       retryDelay: 5000, // (default) wait for 5s before trying again
       headers: {
         'Content-Type': 'Application/json',
-        'authorization': this.pin,
         'connection': 'keep-alive'
       }
     }, function(err, response) {
@@ -638,7 +637,7 @@ function _getAccessories(instance, callback) {
         } else {
           // Status code = 401/470 = homebridge not running in insecure mode
           if (response.statusCode === 401 || response.statusCode === 470) {
-            debug('HAP Discover failed %s -> %s invalid PIN or homebridge is not running in insecure mode with -I', instance.txt.md, instance.url);
+            debug('HAP Discover failed %s -> %s homebridge is not running in insecure mode with -I', instance.txt.md, instance.url);
             err = new Error('homebridge is not running in insecure mode with -I', response.statusCode);
           } else {
             debug('HAP Discover failed %s -> %s http status code %s', instance.txt.md, instance.url, response.statusCode);
