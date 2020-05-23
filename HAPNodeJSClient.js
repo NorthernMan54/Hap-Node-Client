@@ -12,6 +12,7 @@ var normalizeUUID = require('./lib/util.js').normalizeUUID;
 
 var discovered = [];
 var mdnsCache = [];
+var pinCache = { byIp: {}, byDevice: {} };
 var populateCache = false;
 
 module.exports = {
@@ -214,12 +215,12 @@ HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callback) {
+HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, pin, body, callback) {
   _mdnsLookup(deviceID, function(err, instance) {
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, body, function(err, response) {
+      HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, pin, body, function(err, response) {
         if (err) {
           _mdnsError(deviceID);
         }
@@ -234,11 +235,13 @@ HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callba
  *
  * @param  {type} ipAddress IP Address of homebridge instance
  * @param  {type} port      Port of homebridge instance
+ * @param  {type} pin       Pin of homebridge instance
  * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback) {
+HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, pin, body, callback) {
+  pin = pin || this.pin;
   request({
     eventBus: this._eventBus,
     method: 'PUT',
@@ -247,7 +250,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
     maxAttempts: 1, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': this.pin,
+      'authorization': pin,
       'connection': 'keep-alive'
     },
     body: body
@@ -259,8 +262,8 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
       } else {
         debug('Homebridge Control failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
         callback(new Error('Homebridge control failed'));
@@ -270,6 +273,9 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
       if (response.statusCode !== 204) {
         try {
           rsp = JSON.parse(response.body);
+
+          var key = ipAddress + ':' + port;
+          pinCache.byIp[key] = pin; // save last successful pin
         } catch (ex) {
           debug('Homebridge Response Failed %s:%s', ipAddress, port, response.statusCode, response.statusMessage);
           debug('Homebridge Response Failed %s:%s', ipAddress, port, response.body, ex);
@@ -323,11 +329,13 @@ function _reconnectServer(server) {
  * HAPNodeJSClient.prototype.HAPeventByDeviceID - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
  *
  * @param  {type} deviceID  deviceID homebridge instance
+ * @param  {type} pin       Pin of homebridge instance
  * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback) {
+HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, pin, body, callback) {
+  pin = pin || this.pin;
   // console.log('This-0', this);
   _mdnsLookup(deviceID, function(err, instance) {
     // debug('This-1', instance);
@@ -343,7 +351,7 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
         maxAttempts: 1, // (default) try 5 times
         headers: {
           'Content-Type': 'Application/json',
-          'authorization': this.pin,
+          'authorization': pin,
           'connection': 'keep-alive'
         },
         body: body
@@ -356,9 +364,9 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
           callback(err);
         } else if (response.statusCode !== 207 && response.statusCode !== 204) {
           if (response.statusCode === 401 || response.statusCode === 470) {
-            debug('Homebridge auth failed, invalid PIN %s', this.pin, deviceID, body, err, response.body);
+            debug('Homebridge auth failed, invalid PIN %s', pin, deviceID, body, err, response.body);
             _mdnsError(deviceID);
-            callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+            callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
           } else {
             debug('Homebridge event reg failed %s:%s Status: %s ', deviceID, response.statusCode, body, err, response.body);
             _mdnsError(deviceID);
@@ -367,7 +375,7 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
         } else {
           var rsp;
 
-          // var key = ipAddress + ':' + port;
+          pinCache.byDevice[deviceID] = pin; // save last successful pin
           if (!this.eventRegistry[deviceID]) {
             this.eventRegistry[deviceID] = [];
           }
@@ -399,11 +407,13 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
  *
  * @param  {type} ipAddress IP Address of homebridge instance
  * @param  {type} port      Port of homebridge instance
+ * @param  {type} pin       Pin of homebridge instance
  * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
+HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, pin, body, callback) {
+  pin = pin || this.pin;
   hapRequest({
     eventBus: this._eventBus,
     method: 'PUT',
@@ -412,7 +422,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
     maxAttempts: 1, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': this.pin,
+      'authorization': pin,
       'connection': 'keep-alive'
     },
     body: body
@@ -424,8 +434,8 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
       } else {
         debug('Homebridge event reg failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
         callback(new Error('Homebridge event reg failed'));
@@ -434,6 +444,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
       var rsp;
 
       var key = ipAddress + ':' + port;
+      pinCache.byIp[key] = pin; // save last successful pin
       if (!this.eventRegistry[key]) {
         this.eventRegistry[key] = [];
       }
@@ -462,18 +473,19 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
  * HAPNodeJSClient.prototype.HAPresourceByDeviceID - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
  *
  * @param  {type} DeviceID  DeviceID of homebridge instance
+ * @param  {type} pin       Pin of homebridge instance
  * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callback) {
+HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, pin, body, callback) {
   // console.log('This-0', this);
   _mdnsLookup(deviceID, function(err, instance) {
     // console.log('This-1', this);
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, body, function(err, response) {
+      HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, pin, body, function(err, response) {
         if (err) {
           _mdnsError(deviceID);
         }
@@ -488,11 +500,13 @@ HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callb
  *
  * @param  {type} ipAddress IP Address of homebridge instance
  * @param  {type} port      Port of homebridge instance
+ * @param  {type} pin       Pin of homebridge instance
  * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback) {
+HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, pin, body, callback) {
+  pin = pin || this.pin;
   request({
     eventBus: this._eventBus,
     method: 'POST',
@@ -501,7 +515,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     maxAttempts: 1, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': this.pin,
+      'authorization': pin,
       'connection': 'keep-alive'
     },
     body: body
@@ -513,8 +527,8 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
       callback(err);
     } else if (response.statusCode !== 200) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
       } else {
         debug('Homebridge Status failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err);
         callback(new Error('Homebridge status failed'));
@@ -523,6 +537,9 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
       var rsp;
       try {
         rsp = response.body;
+
+        var key = ipAddress + ':' + port;
+        pinCache.byIp[key] = pin; // save last successful pin
       } catch (ex) {
         debug('Homebridge Response Failed %s:%s', ipAddress, port, response.statusCode, response.statusMessage);
         debug('Homebridge Response Failed %s:%s', ipAddress, port, ex);
@@ -539,18 +556,19 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
  * HAPNodeJSClient.prototype.HAPstatusByDeviceID - Get current status for characteristics
  *
  * @param  {type} deviceID  deviceID of homebridge instance
+ * @param  {type} pin       Pin of homebridge instance
  * @param  {type} body      description
  * @param  {type} callback  Callback to execute upon completion of characteristic getting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callback) {
+HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, pin, body, callback) {
   // console.log('This-0', this);
   _mdnsLookup(deviceID, function(err, instance) {
     // console.log('This-1', this);
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, body, function(err, response) {
+      HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, pin, body, function(err, response) {
         if (err) {
           _mdnsError(deviceID);
         }
@@ -565,12 +583,14 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callbac
  *
  * @param  {type} ipAddress IP Address of homebridge instance
  * @param  {type} port      Port of homebridge instance
+ * @param  {type} pin       Pin of homebridge instance
  * @param  {type} body      description
  * @param  {type} callback  Callback to execute upon completion of characteristic getting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
-  // debug('HAPstatus', this.pin);
+HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, pin, body, callback) {
+  pin = pin || this.pin;
+  // debug('HAPstatus', pin);
   request({
     eventBus: this._eventBus,
     method: 'GET',
@@ -579,20 +599,20 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
     maxAttempts: 1, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': this.pin,
+      'authorization': pin,
       'connection': 'keep-alive'
     }
   }, function(err, response) {
     // Response s/b 200 OK
     // debug('HAPstatus', 'http://' + ipAddress + ':' + port + '/characteristics' + body);
-    // debug('HAPstatus-1', this.pin);
+    // debug('HAPstatus-1', pin);
     if (err) {
       //      debug('Homebridge Status failed %s:%s', ipAddress, port, body, err);
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 200) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
       } else {
         debug('Homebridge Status failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
         callback(new Error('Homebridge status failed'));
@@ -601,6 +621,9 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
       var rsp;
       try {
         rsp = JSON.parse(response.body);
+
+        var key = ipAddress + ':' + port;
+        pinCache.byIp[key] = pin; // save last successful pin
       } catch (ex) {
         debug('Homebridge Response Failed %s:%s', ipAddress, port, response.statusCode, response.statusMessage);
         debug('Homebridge Response Failed %s:%s', ipAddress, port, response.body, ex);
