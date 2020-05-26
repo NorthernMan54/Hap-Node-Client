@@ -244,7 +244,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
     method: 'PUT',
     url: 'http://' + ipAddress + ':' + port + '/characteristics',
     timeout: this.reqTimeout,
-    maxAttempts: 1, // (default) try 5 times
+    maxAttempts: 5, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
       'authorization': this.pin,
@@ -340,7 +340,7 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
         deviceID: deviceID,
         url: 'http://' + instance.host + ':' + instance.port + '/characteristics',
         timeout: this.reqTimeout,
-        maxAttempts: 1, // (default) try 5 times
+        maxAttempts: 5, // (default) try 5 times
         headers: {
           'Content-Type': 'Application/json',
           'authorization': this.pin,
@@ -409,7 +409,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
     method: 'PUT',
     url: 'http://' + ipAddress + ':' + port + '/characteristics',
     timeout: this.reqTimeout,
-    maxAttempts: 1, // (default) try 5 times
+    maxAttempts: 5, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
       'authorization': this.pin,
@@ -498,7 +498,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     method: 'POST',
     url: 'http://' + ipAddress + ':' + port + '/resource',
     timeout: this.reqTimeout,
-    maxAttempts: 1, // (default) try 5 times
+    maxAttempts: 5, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
       'authorization': this.pin,
@@ -576,7 +576,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
     method: 'GET',
     url: 'http://' + ipAddress + ':' + port + '/characteristics' + body,
     timeout: this.reqTimeout,
-    maxAttempts: 1, // (default) try 5 times
+    maxAttempts: 5, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
       'authorization': this.pin,
