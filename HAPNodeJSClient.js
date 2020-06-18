@@ -14,6 +14,9 @@ var discovered = [];
 var mdnsCache = [];
 var populateCache = false;
 
+var filter = false;
+var pin;
+
 module.exports = {
   HAPNodeJSClient: HAPNodeJSClient
 };
@@ -41,8 +44,8 @@ function HAPNodeJSClient(options) {
   this.refresh = options.refresh || 900;
   this.timeout = options.timeout || 20;
   this.reqTimeout = options.reqTimeout || 7000;
-  this.pin = options.pin || '031-45-154';
-  this.filter = options.filter || false;
+  pin = options.pin || '031-45-154';
+  filter = options.filter || false;
   if (this.debug) {
     let debugEnable = require('debug');
     let namespaces = debugEnable.disable();
@@ -247,7 +250,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
     maxAttempts: 1, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': this.pin,
+      'authorization': pin,
       'connection': 'keep-alive'
     },
     body: body
@@ -259,8 +262,8 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
       } else {
         debug('Homebridge Control failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
         callback(new Error('Homebridge control failed'));
@@ -343,7 +346,7 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
         maxAttempts: 1, // (default) try 5 times
         headers: {
           'Content-Type': 'Application/json',
-          'authorization': this.pin,
+          'authorization': pin,
           'connection': 'keep-alive'
         },
         body: body
@@ -356,9 +359,9 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
           callback(err);
         } else if (response.statusCode !== 207 && response.statusCode !== 204) {
           if (response.statusCode === 401 || response.statusCode === 470) {
-            debug('Homebridge auth failed, invalid PIN %s', this.pin, deviceID, body, err, response.body);
+            debug('Homebridge auth failed, invalid PIN %s', pin, deviceID, body, err, response.body);
             _mdnsError(deviceID);
-            callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+            callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
           } else {
             debug('Homebridge event reg failed %s:%s Status: %s ', deviceID, response.statusCode, body, err, response.body);
             _mdnsError(deviceID);
@@ -412,7 +415,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
     maxAttempts: 1, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': this.pin,
+      'authorization': pin,
       'connection': 'keep-alive'
     },
     body: body
@@ -424,8 +427,8 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
       } else {
         debug('Homebridge event reg failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
         callback(new Error('Homebridge event reg failed'));
@@ -501,7 +504,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     maxAttempts: 1, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': this.pin,
+      'authorization': pin,
       'connection': 'keep-alive'
     },
     body: body
@@ -513,8 +516,8 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
       callback(err);
     } else if (response.statusCode !== 200) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
       } else {
         debug('Homebridge Status failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err);
         callback(new Error('Homebridge status failed'));
@@ -570,7 +573,7 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callbac
  */
 
 HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
-  // debug('HAPstatus', this.pin);
+  // debug('HAPstatus', pin);
   request({
     eventBus: this._eventBus,
     method: 'GET',
@@ -579,20 +582,20 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
     maxAttempts: 1, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': this.pin,
+      'authorization': pin,
       'connection': 'keep-alive'
     }
   }, function(err, response) {
     // Response s/b 200 OK
     // debug('HAPstatus', 'http://' + ipAddress + ':' + port + '/characteristics' + body);
-    // debug('HAPstatus-1', this.pin);
+    // debug('HAPstatus-1', pin);
     if (err) {
       //      debug('Homebridge Status failed %s:%s', ipAddress, port, body, err);
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 200) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', this.pin, ipAddress, port, body, err, response.body);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + this.pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
       } else {
         debug('Homebridge Status failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
         callback(new Error('Homebridge status failed'));
@@ -611,12 +614,12 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
       // debug('HAPStatus callback', rsp);
       callback(null, rsp);
     }
-  }.bind(this));
+  });
 };
 
 function _getAccessories(instance, callback) {
-  // debug('_getAccessories', instance);
-  if ((this.filter && this.filter === instance.host + ':' + instance.port) || !this.filter) {
+  // debug('_getAccessories', filter);
+  if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
     request({
       eventBus: this._eventBus,
       method: 'GET',
@@ -626,7 +629,7 @@ function _getAccessories(instance, callback) {
       retryDelay: 5000, // (default) wait for 5s before trying again
       headers: {
         'Content-Type': 'Application/json',
-        'authorization': this.pin,
+        'authorization': pin,
         'connection': 'keep-alive'
       }
     }, function(err, response) {
