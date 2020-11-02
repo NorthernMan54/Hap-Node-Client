@@ -99,6 +99,7 @@ function HAPNodeJSClient(options) {
     events.forEach(function(event) {
       // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
       this.emit(event.host + event.port + event.aid + event.iid, event);
+      this.emit(event.deviceID + event.aid + event.iid, event);
     }.bind(this));
   }.bind(this));
   // debug('This', this);
