@@ -174,7 +174,7 @@ function _populateCache(timeout, discovery, callback) {
           deviceID: result.txt.id,
           txt: result.txt
         };
-        debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
+        // debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
         // debug('discovery', discovery);
         if (discovery) {
           discovery.call(this, mdnsCache[result.txt.id], function() {});
@@ -503,6 +503,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
     url: 'http://' + ipAddress + ':' + port + '/resource',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
+    encoding: null,
     headers: {
       'Content-Type': 'Application/json',
       'authorization': pin,
