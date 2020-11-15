@@ -92,7 +92,7 @@ function HAPNodeJSClient(options) {
      * @property {object} value - Updated characteristic value
      * @example Sample Message
      *
-     * { host: '192.168.1.4', port: 51826, aid: 16, iid: 11, status: false }
+     * [{"host":"192.168.1.13","port":43787,"deviceID":"76:59:CE:25:B9:6E","aid":1,"iid":13,"value":true,"status":true}]
      */
     this.emit('hapEvent', events);
     this.emit(events[0].host + events[0].port + events[0].aid, events);
@@ -297,27 +297,79 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback)
 function _reconnectServer(server) {
   debug('HAPevent events Reregister', server);
   // debug('This', this, server);
-
+  var events = [];
+  this.eventRegistry[server.deviceID].forEach(function(device) {
+    events.push({
+      deviceID: server.deviceID,
+      aid: device.aid,
+      iid: device.iid,
+      status: -70402
+    });
+  });
+  this.emit('hapEvent', events);
+  // this.emit(events[0].host + events[0].port + events[0].aid, events);
+  events.forEach(function(event) {
+    // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
+    // this.emit(event.host + event.port + event.aid + event.iid, event);
+    this.emit(event.deviceID + event.aid + event.iid, event);
+  }.bind(this));
   var reconnectTimer;
   if (server.deviceID) {
     reconnectTimer = setInterval(function() {
       this.HAPeventByDeviceID(server.deviceID, JSON.stringify({
         characteristics: this.eventRegistry[server.deviceID]
-      }), clearTimer);
+      }), clearTimer.bind(this));
     }.bind(this), 60000);
   } else {
     reconnectTimer = setInterval(function() {
       this.HAPevent(server.server.split(':')[0], server.server.split(':')[1], JSON.stringify({
         characteristics: this.eventRegistry[server.server]
-      }), clearTimer);
+      }), clearTimer.bind(this));
     }.bind(this), 60000);
   }
 
   function clearTimer(err, rsp) {
     if (err) {
       debug('HAPevent event reregister failed, retry in 60', server);
+      /*
+       *
+       * [{"host":"192.168.1.13","port":43787,"deviceID":"76:59:CE:25:B9:6E","aid":1,"iid":13,"value":true,"status":true}]
+       */
+      debug('clearTimer', server, this.eventRegistry[server.deviceID]);
+      var events = [];
+      this.eventRegistry[server.deviceID].forEach(function(device) {
+        events.push({
+          deviceID: server.deviceID,
+          aid: device.aid,
+          iid: device.iid,
+          status: -70402
+        });
+      });
+      this.emit('hapEvent', events);
+      // this.emit(events[0].host + events[0].port + events[0].aid, events);
+      events.forEach(function(event) {
+        // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
+        // this.emit(event.host + event.port + event.aid + event.iid, event);
+        this.emit(event.deviceID + event.aid + event.iid, event);
+      }.bind(this));
     } else {
       debug('HAPevent event reregister succeeded', server);
+      var events = [];
+      this.eventRegistry[server.deviceID].forEach(function(device) {
+        events.push({
+          deviceID: server.deviceID,
+          aid: device.aid,
+          iid: device.iid,
+          status: true
+        });
+      });
+      this.emit('hapEvent', events);
+      // this.emit(events[0].host + events[0].port + events[0].aid, events);
+      events.forEach(function(event) {
+        // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
+        // this.emit(event.host + event.port + event.aid + event.iid, event);
+        this.emit(event.deviceID + event.aid + event.iid, event);
+      }.bind(this));
       clearInterval(reconnectTimer);
     }
   }
