@@ -1,18 +1,17 @@
 {
   "name": "hap-node-client",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Client for Hap-NodeJS",
   "main": "HAPNodeJSClient.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "api": "documentation build HAPNodeJSClient.js lib/hapRequest.js lib/eventedHttpClient.js lib/httpParser.js -f md --config docs/documentation.yml > docs/API.md",
-    "document": "./gh-md-toc --insert README.md"
+    "build": "cd scripts; node gen-hap-types.js"
   },
   "devDependencies": {
-    "documentation": "13.1.0"
+    "documentation": "13.1.0",
+    "hap-nodejs": "0.9.3"
   },
   "dependencies": {
     "better-queue": ">=3.8.10",

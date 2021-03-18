@@ -144,7 +144,7 @@
         "perms": ["pr", "ev"],
         "format": "float",
         "value": 4.4,
-        "description": "Current Temperature",
+        "description": "Current",
         "unit": "celsius",
         "maxValue": 100,
         "minValue": -100,
@@ -168,7 +168,7 @@
         "perms": ["pr", "ev"],
         "format": "uint8",
         "value": 0,
-        "description": "Contact Sensor State",
+        "description": "Contact State",
         "valid-values": [0, 1],
         "maxValue": 1,
         "minValue": 0
