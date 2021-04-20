@@ -1,7 +1,6 @@
 'use strict';
 
 var request = require('requestretry');
-// var request = require('./lib/hapRequest.js');
 var hapRequest = require('./lib/hapRequest.js');
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('util').inherits;
@@ -15,7 +14,7 @@ var mdnsCache = [];
 var populateCache = false;
 
 var filter = false;
-var pin;
+var pins = {};
 
 module.exports = {
   HAPNodeJSClient: HAPNodeJSClient
@@ -44,7 +43,7 @@ function HAPNodeJSClient(options) {
   this.refresh = options.refresh || 900;
   this.timeout = options.timeout || 20;
   this.reqTimeout = options.reqTimeout || 7000;
-  pin = options.pin || '031-45-154';
+  this.RegisterPin('default', options.pin || '031-45-154');
   filter = options.filter || false;
   if (this.debug) {
     let debugEnable = require('debug');
@@ -59,7 +58,7 @@ function HAPNodeJSClient(options) {
     // this.log('DEBUG-2', namespaces);
     debugEnable.enable(namespaces);
   }
-  this.eventRegistry = [];
+  this.eventRegistry = {};
   _discovery.call(this);
   this._eventBus = new EventEmitter();
   setInterval(_discovery.bind(this), this.refresh * 1000);
@@ -194,6 +193,35 @@ function _populateCache(timeout, discovery, callback) {
   }
 }
 
+function _findPinByKey(key) {
+  if (!key) {
+    return pins['default'];
+  }
+
+  key = key.toLowerCase();
+  return pins[key] || pins['default'];
+}
+
+/**
+ * HAPNodeJSClient.prototype.RegisterPin - Register pin numbers ()
+ *
+ * @class
+ * @param  {type} key  Unique identifier of homebridge instance (ip:port or deviceID)
+ * @param  {type} pin  Homebridge PIN
+ * @return {type} bool updated
+ */
+
+HAPNodeJSClient.prototype.RegisterPin = function(key, pin) {
+  if (!key || (key in pins && pins[key] === pin)) {
+    return false;
+  }
+
+  key = key.toLowerCase();
+  pins[key] = pin;
+  debug('Registered/updated PIN for `%s`: %s', key, pin);
+  return true;
+};
+
 /**
  * HAPNodeJSClient.prototype.HAPaccessories - Returns an array of all homebridge instances, and the accessories for each.
  *
@@ -243,10 +271,12 @@ HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callba
  */
 
 HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback) {
+  var host = ipAddress + ':' + port;
+  var pin = _findPinByKey(host);
   request({
     eventBus: this._eventBus,
     method: 'PUT',
-    url: 'http://' + ipAddress + ':' + port + '/characteristics',
+    url: 'http://' + host + '/characteristics',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
@@ -329,6 +359,7 @@ function _reconnectServer(server) {
   }
 
   function clearTimer(err, rsp) {
+    var events = [];
     if (err) {
       debug('HAPevent event reregister failed, retry in 60', server);
       /*
@@ -336,7 +367,6 @@ function _reconnectServer(server) {
        * [{"host":"192.168.1.13","port":43787,"deviceID":"76:59:CE:25:B9:6E","aid":1,"iid":13,"value":true,"status":true}]
        */
       debug('clearTimer', server, this.eventRegistry[server.deviceID]);
-      var events = [];
       this.eventRegistry[server.deviceID].forEach(function(device) {
         events.push({
           deviceID: server.deviceID,
@@ -354,7 +384,6 @@ function _reconnectServer(server) {
       }.bind(this));
     } else {
       debug('HAPevent event reregister succeeded', server);
-      var events = [];
       this.eventRegistry[server.deviceID].forEach(function(device) {
         events.push({
           deviceID: server.deviceID,
@@ -390,6 +419,9 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
     if (err) {
       callback(err);
     } else {
+      var host = instance.host + ':' + instance.port;
+      var pin = _findPinByKey(deviceID);
+
       hapRequest({
         eventBus: this._eventBus,
         method: 'PUT',
@@ -422,8 +454,8 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
           }
         } else {
           var rsp;
+          this.RegisterPin(host, pin);
 
-          // var key = ipAddress + ':' + port;
           if (!this.eventRegistry[deviceID]) {
             this.eventRegistry[deviceID] = [];
           }
@@ -460,10 +492,12 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
  */
 
 HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
+  var host = ipAddress + ':' + port;
+  var pin = _findPinByKey(host);
   hapRequest({
     eventBus: this._eventBus,
     method: 'PUT',
-    url: 'http://' + ipAddress + ':' + port + '/characteristics',
+    url: 'http://' + host + '/characteristics',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
@@ -549,10 +583,13 @@ HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callb
  */
 
 HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback) {
+  var host = ipAddress + ':' + port;
+  var pin = _findPinByKey(host);
+
   request({
     eventBus: this._eventBus,
     method: 'POST',
-    url: 'http://' + ipAddress + ':' + port + '/resource',
+    url: 'http://' + host + '/resource',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     encoding: null,
@@ -627,11 +664,14 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callbac
  */
 
 HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
+  var host = ipAddress + ':' + port;
+  var pin = _findPinByKey(host);
+
   // debug('HAPstatus', pin);
   request({
     eventBus: this._eventBus,
     method: 'GET',
-    url: 'http://' + ipAddress + ':' + port + '/characteristics' + body,
+    url: 'http://' + host + '/characteristics' + body,
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
@@ -674,6 +714,9 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) 
 function _getAccessories(instance, callback) {
   // debug('_getAccessories', filter);
   if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
+    var host = instance.host + ':' + instance.port;
+    var pin = _findPinByKey(host);
+
     request({
       eventBus: this._eventBus,
       method: 'GET',
