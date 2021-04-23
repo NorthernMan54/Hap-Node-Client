@@ -21,7 +21,7 @@
     "extend": ">=3.0.2",
     "ip": ">=1.1.5",
     "once": ">=1.4.0",
-    "requestretry": "^4.1.1",
+    "requestretry": "^5.0.0",
     "request": "^2.88.2"
   },
   "repository": {
