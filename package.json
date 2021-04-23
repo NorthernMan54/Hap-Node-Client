@@ -10,7 +10,7 @@
     "build": "cd scripts; node gen-hap-types.js"
   },
   "devDependencies": {
-    "documentation": "13.1.0",
+    "documentation": "13.2.4",
     "hap-nodejs": "0.9.3"
   },
   "dependencies": {
