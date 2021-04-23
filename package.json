@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "documentation": "13.2.4",
-    "hap-nodejs": "0.9.3"
+    "hap-nodejs": "0.9.4"
   },
   "dependencies": {
     "better-queue": ">=3.8.10",
