@@ -10,7 +10,7 @@ var ip = require('ip');
 var normalizeUUID = require('./lib/util.js').normalizeUUID;
 
 var discovered = [];
-var mdnsCache = [];
+var mdnsCache = {};
 var populateCache = false;
 
 var filter = false;
@@ -125,6 +125,11 @@ function _mdnsLookup(deviceID, callback) {
     _populateCache(4, null, function() {
       if (mdnsCache[deviceID]) {
         // debug('refreshed', mdnsCache[deviceID]);
+
+        var pin = _findPinByKey(deviceID);
+        var host = mdnsCache[deviceID].host + ':' + mdnsCache[deviceID].port;
+        this.RegisterPin(host, pin);
+
         callback(null, mdnsCache[deviceID]);
       } else {
         callback(new Error('ERROR: HB Instance not found', deviceID), null);
@@ -256,7 +261,7 @@ HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callba
           _mdnsError(deviceID);
         }
         callback(err, response);
-      });
+      }, instance);
     }
   }.bind(this));
 };
@@ -270,9 +275,9 @@ HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callba
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback) {
-  var host = ipAddress + ':' + port;
-  var pin = _findPinByKey(host);
+HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback, instance) {
+  var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
+
   request({
     eventBus: this._eventBus,
     method: 'PUT',
@@ -419,7 +424,6 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
     if (err) {
       callback(err);
     } else {
-      var host = instance.host + ':' + instance.port;
       var pin = _findPinByKey(deviceID);
 
       hapRequest({
@@ -454,7 +458,6 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
           }
         } else {
           var rsp;
-          this.RegisterPin(host, pin);
 
           if (!this.eventRegistry[deviceID]) {
             this.eventRegistry[deviceID] = [];
@@ -491,9 +494,8 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback) {
-  var host = ipAddress + ':' + port;
-  var pin = _findPinByKey(host);
+HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback, instance) {
+  var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
   hapRequest({
     eventBus: this._eventBus,
     method: 'PUT',
@@ -568,7 +570,7 @@ HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callb
           _mdnsError(deviceID);
         }
         callback(err, response);
-      });
+      }, instance);
     }
   }.bind(this));
 };
@@ -582,9 +584,8 @@ HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callb
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback) {
-  var host = ipAddress + ':' + port;
-  var pin = _findPinByKey(host);
+HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback, instance) {
+  var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
 
   request({
     eventBus: this._eventBus,
@@ -649,7 +650,7 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callbac
           _mdnsError(deviceID);
         }
         callback(err, response);
-      });
+      }, instance);
     }
   }.bind(this));
 };
@@ -663,9 +664,8 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callbac
  * @param  {type} callback  Callback to execute upon completion of characteristic getting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback) {
-  var host = ipAddress + ':' + port;
-  var pin = _findPinByKey(host);
+HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback, instance) {
+  var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
 
   // debug('HAPstatus', pin);
   request({
