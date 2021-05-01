@@ -281,7 +281,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback,
   request({
     eventBus: this._eventBus,
     method: 'PUT',
-    url: 'http://' + host + '/characteristics',
+    url: 'http://' + ipAddress + ':' + port + '/characteristics',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
@@ -499,7 +499,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback, i
   hapRequest({
     eventBus: this._eventBus,
     method: 'PUT',
-    url: 'http://' + host + '/characteristics',
+    url: 'http://' + ipAddress + ':' + port + '/characteristics',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
@@ -590,7 +590,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
   request({
     eventBus: this._eventBus,
     method: 'POST',
-    url: 'http://' + host + '/resource',
+    url: 'http://' + ipAddress + ':' + port + '/resource',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     encoding: null,
@@ -671,7 +671,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback, 
   request({
     eventBus: this._eventBus,
     method: 'GET',
-    url: 'http://' + host + '/characteristics' + body,
+    url: 'http://' + ipAddress + ':' + port + '/characteristics' + body,
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
