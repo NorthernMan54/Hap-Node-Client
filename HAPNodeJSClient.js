@@ -134,7 +134,7 @@ function _mdnsLookup(deviceID, callback) {
       } else {
         callback(new Error('ERROR: HB Instance not found', deviceID), null);
       }
-    });
+    }.bind(this));
   }
 }
 
