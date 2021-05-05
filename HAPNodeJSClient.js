@@ -145,7 +145,7 @@ function _mdnsError(deviceID) {
     if (mdnsCache[deviceID]) {
       // debug('refreshed', mdnsCache[deviceID]);
     }
-  });
+  }.bind(this));
 }
 
 function _populateCache(timeout, discovery, callback) {
