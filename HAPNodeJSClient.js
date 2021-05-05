@@ -126,15 +126,11 @@ function _mdnsLookup(deviceID, callback) {
       if (mdnsCache[deviceID]) {
         // debug('refreshed', mdnsCache[deviceID]);
 
-        var pin = _findPinByKey(deviceID);
-        var host = mdnsCache[deviceID].host + ':' + mdnsCache[deviceID].port;
-        this.RegisterPin(host, pin);
-
         callback(null, mdnsCache[deviceID]);
       } else {
         callback(new Error('ERROR: HB Instance not found', deviceID), null);
       }
-    }.bind(this));
+    });
   }
 }
 
