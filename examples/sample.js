@@ -19,7 +19,7 @@ var homebridge = new HAPNodeJSClient(options);
 homebridge.on('Ready', function() {
   homebridge.HAPaccessories(function(endPoints) {
     console.log("-------------------------------------------------------");
-    console.log("alexaDiscovery", endPoints.length);
+    console.log("Found", endPoints.length);
 
     endPoints.forEach(function(entry) {
       console.log(entry);
