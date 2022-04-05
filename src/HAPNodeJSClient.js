@@ -162,7 +162,7 @@ function _populateCache(timeout, discovery, callback) {
 
         for (const address of result.addresses) {
           if (ip.isV4Format(address)) {
-            if (!address.startsWith('169.254') && !address.startsWith('127.0.0.1')) {
+            if (!address.startsWith('169.254')) {
               ipAddress = address;
               url = 'http://' + ipAddress + ':' + result.port;
               break;
