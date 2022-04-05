@@ -2,7 +2,7 @@
 // Sample discovery fragment
 //
 
-var HAPNodeJSClient = require('../HAPNodeJSClient.js').HAPNodeJSClient;
+var HAPNodeJSClient = require('../src/HAPNodeJSClient.js').HAPNodeJSClient;
 
 var options = {
   // clientId: this.username,

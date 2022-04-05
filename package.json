@@ -2,9 +2,9 @@
   "name": "hap-node-client",
   "version": "0.1.21",
   "description": "Client for Hap-NodeJS",
-  "main": "HAPNodeJSClient.js",
+  "main": "src/HAPNodeJSClient.js",
   "directories": {
-    "lib": "lib"
+    "src": "src"
   },
   "scripts": {
     "build": "cd scripts; node gen-hap-types.js"
@@ -14,15 +14,15 @@
     "hap-nodejs": "0.9.4"
   },
   "dependencies": {
+    "axios": "^0.26.1",
+    "axios-retry": "^3.2.4",
     "better-queue": ">=3.8.10",
-    "bonjour-hap": "^3.5.10",
-    "buffer": "^6.0.3",
-    "debug": ">2.6.9",
+    "bonjour-hap": ">=3.5.10",
+    "buffer": ">=6.0.3",
+    "debug": ">=2.6.9",
     "extend": ">=3.0.2",
     "ip": ">=1.1.5",
-    "once": ">=1.4.0",
-    "requestretry": "^5.0.0",
-    "request": "^2.88.2"
+    "once": ">=1.4.0"
   },
   "repository": {
     "type": "git",
