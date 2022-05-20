@@ -142,7 +142,7 @@ function _mdnsError(deviceID) {
       // debug('refreshed', mdnsCache[deviceID]);
     }
   });
-}
+} 
 
 function _populateCache(timeout, discovery, callback) {
   // debug('_populateCache', populateCache);
@@ -172,7 +172,8 @@ function _populateCache(timeout, discovery, callback) {
           port: result.port,
           url: url,
           deviceID: result.txt.id,
-          txt: result.txt
+          txt: result.txt,
+          name: result.name
         };
         // debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
         // debug('discovery', discovery);
@@ -234,6 +235,16 @@ HAPNodeJSClient.prototype.RegisterPin = function(key, pin) {
 HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
   // This is a callback as in the future may need to call something
   callback(discovered);
+};
+
+/**
+ * HAPNodeJSClient.prototype.mdnsCache
+ * 
+ * @returns mdnsCacheObject
+ */
+
+HAPNodeJSClient.prototype.mdnsCache = function() {
+  return mdnsCache;
 };
 
 // curl -X PUT http://127.0.0.1:51826/characteristics --header "Content-Type:Application/json"
@@ -753,7 +764,7 @@ function _getAccessories(instance, callback) {
           return;
         }
         if (message && Object.keys(message.accessories).length > 0) {
-          debug('Homebridge instance discovered %s with %s accessories', instance.txt.md, Object.keys(message.accessories).length);
+          debug('Homebridge instance discovered %s @ %s with %s accessories', instance.name, instance.url, Object.keys(message.accessories).length);
           discovered.push({
             ipAddress: instance.host,
             instance: instance,
