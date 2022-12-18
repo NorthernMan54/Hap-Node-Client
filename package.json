@@ -1,6 +1,6 @@
 {
   "name": "hap-node-client",
-  "version": "0.1.25",
+  "version": "0.1.27",
   "description": "Client for Hap-NodeJS",
   "main": "HAPNodeJSClient.js",
   "directories": {
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "better-queue": ">=3.8.10",
-    "bonjour-hap": "^3.5.10",
+    "bonjour-hap": "^3.6.4",
     "buffer": "^6.0.3",
     "debug": ">2.6.9",
     "extend": ">=3.0.2",

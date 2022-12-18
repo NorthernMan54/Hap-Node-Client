@@ -76,7 +76,7 @@ function HAPNodeJSClient(options) {
 
   this._eventBus.on('Disconnected', _reconnectServer.bind(this));
 
-  this._eventBus.on('Event', function(events) {
+  this._eventBus.on('Event', function (events) {
     debug('Events', JSON.stringify(events));
     /**
      * HomeKit Accessory Characteristic event pass thru
@@ -95,7 +95,7 @@ function HAPNodeJSClient(options) {
      */
     this.emit('hapEvent', events);
     this.emit(events[0].host + events[0].port + events[0].aid, events);
-    events.forEach(function(event) {
+    events.forEach(function (event) {
       // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
       this.emit(event.host + event.port + event.aid + event.iid, event);
       this.emit(event.deviceID + event.aid + event.iid, event);
@@ -110,7 +110,7 @@ function _discovery() {
   debug('Starting Homebridge instance discovery');
   discovered = [];
   // debug('this-0', this);
-  _populateCache(this.timeout, _getAccessories, function() {
+  _populateCache(this.timeout, _getAccessories, function () {
     debug('Ready');
     this.emit('Ready', discovered);
   }.bind(this));
@@ -122,7 +122,7 @@ function _mdnsLookup(deviceID, callback) {
     // debug('cached', mdnsCache[serviceName].url);
     callback(null, mdnsCache[deviceID]);
   } else {
-    _populateCache(4, null, function() {
+    _populateCache(4, null, function () {
       if (mdnsCache[deviceID]) {
         // debug('refreshed', mdnsCache[deviceID]);
 
@@ -137,12 +137,12 @@ function _mdnsLookup(deviceID, callback) {
 function _mdnsError(deviceID) {
   // debug('\_mdnsError ', deviceID);
   mdnsCache[deviceID] = false;
-  _populateCache(4, null, function() {
+  _populateCache(4, null, function () {
     if (mdnsCache[deviceID]) {
       // debug('refreshed', mdnsCache[deviceID]);
     }
   });
-} 
+}
 
 function _populateCache(timeout, discovery, callback) {
   // debug('_populateCache', populateCache);
@@ -151,16 +151,16 @@ function _populateCache(timeout, discovery, callback) {
     // debug('_populateCache', new Error().stack);
     var browser = bonjour.find({
       type: 'hap'
-    }, function(result) {
+    }, function (result) {
       if (result.txt) {
-        debug('HAP Device discovered', result.name);
+        debug('HAP Device discovered', result.name, result.addresses);
         var ipAddress, url;
 
         for (const address of result.addresses) {
           if (ip.isV4Format(address) && address.substring(0, 7) !== '169.254') {
             ipAddress = address;
             url = 'http://' + ipAddress + ':' + result.port;
-            break;
+            // break;
           } else if (ip.isV6Format(address)) {
             ipAddress = address;
             url = 'http://[' + ipAddress + ']:' + result.port;
@@ -178,13 +178,13 @@ function _populateCache(timeout, discovery, callback) {
         // debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
         // debug('discovery', discovery);
         if (discovery) {
-          discovery.call(this, mdnsCache[result.txt.id], function() {});
+          discovery.call(this, mdnsCache[result.txt.id], function () { });
         }
       } else {
         debug('Unsupported device found, skipping', result.name);
       }
     });
-    setTimeout(function() {
+    setTimeout(function () {
       // debug('Timeout:');
       browser.stop();
       populateCache = false;
@@ -213,7 +213,7 @@ function _findPinByKey(key) {
  * @return {type} bool updated
  */
 
-HAPNodeJSClient.prototype.RegisterPin = function(key, pin) {
+HAPNodeJSClient.prototype.RegisterPin = function (key, pin) {
   if (!key || (key in pins && pins[key] === pin)) {
     return false;
   }
@@ -232,7 +232,7 @@ HAPNodeJSClient.prototype.RegisterPin = function(key, pin) {
  * @return {type}          description
  */
 
-HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
+HAPNodeJSClient.prototype.HAPaccessories = function (callback) {
   // This is a callback as in the future may need to call something
   callback(discovered);
 };
@@ -243,7 +243,7 @@ HAPNodeJSClient.prototype.HAPaccessories = function(callback) {
  * @returns mdnsCacheObject
  */
 
-HAPNodeJSClient.prototype.mdnsCache = function() {
+HAPNodeJSClient.prototype.mdnsCache = function () {
   return mdnsCache;
 };
 
@@ -258,12 +258,12 @@ HAPNodeJSClient.prototype.mdnsCache = function() {
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callback) {
-  _mdnsLookup(deviceID, function(err, instance) {
+HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function (deviceID, body, callback) {
+  _mdnsLookup(deviceID, function (err, instance) {
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, body, function(err, response) {
+      HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, body, function (err, response) {
         if (err) {
           _mdnsError(deviceID);
         }
@@ -282,13 +282,13 @@ HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function(deviceID, body, callba
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback, instance) {
+HAPNodeJSClient.prototype.HAPcontrol = function (ipAddress, port, body, callback, instance) {
   var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
 
   request({
     eventBus: this._eventBus,
     method: 'PUT',
-    url: 'http://' + ipAddress + ':' + port + '/characteristics',
+    url: instance.url + '/characteristics',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
@@ -297,7 +297,7 @@ HAPNodeJSClient.prototype.HAPcontrol = function(ipAddress, port, body, callback,
       'connection': 'keep-alive'
     },
     body: body
-  }, function(err, response) {
+  }, function (err, response) {
     // Response s/b 200 OK
 
     if (err) {
@@ -340,7 +340,7 @@ function _reconnectServer(server) {
   debug('HAPevent events Reregister', server);
   // debug('This', this, server);
   var events = [];
-  this.eventRegistry[server.deviceID].forEach(function(device) {
+  this.eventRegistry[server.deviceID].forEach(function (device) {
     events.push({
       deviceID: server.deviceID,
       aid: device.aid,
@@ -350,20 +350,20 @@ function _reconnectServer(server) {
   });
   this.emit('hapEvent', events);
   // this.emit(events[0].host + events[0].port + events[0].aid, events);
-  events.forEach(function(event) {
+  events.forEach(function (event) {
     // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
     // this.emit(event.host + event.port + event.aid + event.iid, event);
     this.emit(event.deviceID + event.aid + event.iid, event);
   }.bind(this));
   var reconnectTimer;
   if (server.deviceID) {
-    reconnectTimer = setInterval(function() {
+    reconnectTimer = setInterval(function () {
       this.HAPeventByDeviceID(server.deviceID, JSON.stringify({
         characteristics: this.eventRegistry[server.deviceID]
       }), clearTimer.bind(this));
     }.bind(this), 60000);
   } else {
-    reconnectTimer = setInterval(function() {
+    reconnectTimer = setInterval(function () {
       this.HAPevent(server.server.split(':')[0], server.server.split(':')[1], JSON.stringify({
         characteristics: this.eventRegistry[server.server]
       }), clearTimer.bind(this));
@@ -379,7 +379,7 @@ function _reconnectServer(server) {
        * [{"host":"192.168.1.13","port":43787,"deviceID":"76:59:CE:25:B9:6E","aid":1,"iid":13,"value":true,"status":true}]
        */
       debug('clearTimer', server, this.eventRegistry[server.deviceID]);
-      this.eventRegistry[server.deviceID].forEach(function(device) {
+      this.eventRegistry[server.deviceID].forEach(function (device) {
         events.push({
           deviceID: server.deviceID,
           aid: device.aid,
@@ -389,14 +389,14 @@ function _reconnectServer(server) {
       });
       this.emit('hapEvent', events);
       // this.emit(events[0].host + events[0].port + events[0].aid, events);
-      events.forEach(function(event) {
+      events.forEach(function (event) {
         // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
         // this.emit(event.host + event.port + event.aid + event.iid, event);
         this.emit(event.deviceID + event.aid + event.iid, event);
       }.bind(this));
     } else {
       debug('HAPevent event reregister succeeded', server);
-      this.eventRegistry[server.deviceID].forEach(function(device) {
+      this.eventRegistry[server.deviceID].forEach(function (device) {
         events.push({
           deviceID: server.deviceID,
           aid: device.aid,
@@ -406,7 +406,7 @@ function _reconnectServer(server) {
       });
       this.emit('hapEvent', events);
       // this.emit(events[0].host + events[0].port + events[0].aid, events);
-      events.forEach(function(event) {
+      events.forEach(function (event) {
         // debug('hapEvent', event.host + event.port + event.aid + event.iid, event);
         // this.emit(event.host + event.port + event.aid + event.iid, event);
         this.emit(event.deviceID + event.aid + event.iid, event);
@@ -424,20 +424,21 @@ function _reconnectServer(server) {
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback) {
+HAPNodeJSClient.prototype.HAPeventByDeviceID = function (deviceID, body, callback) {
   // console.log('This-0', this);
-  _mdnsLookup(deviceID, function(err, instance) {
+  _mdnsLookup(deviceID, function (err, instance) {
     // debug('This-1', instance);
     if (err) {
       callback(err);
     } else {
       var pin = _findPinByKey(deviceID);
-
+      // debug("HAPeventByDeviceID", instance);
+      // debug('HAPeventByDeviceID:', 'http://[' + instance.host + ']:' + instance.port + '/characteristics');
       hapRequest({
         eventBus: this._eventBus,
         method: 'PUT',
         deviceID: deviceID,
-        url: 'http://' + instance.host + ':' + instance.port + '/characteristics',
+        url: instance.url + '/characteristics',
         timeout: this.reqTimeout,
         maxAttempts: 5, // (default) try 5 times
         headers: {
@@ -446,7 +447,7 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
           'connection': 'keep-alive'
         },
         body: body
-      }, function(err, response) {
+      }, function (err, response) {
         // Response s/b 200 OK
 
         if (err) {
@@ -501,12 +502,13 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function(deviceID, body, callback
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback, instance) {
+HAPNodeJSClient.prototype.HAPevent = function (ipAddress, port, body, callback, instance) {
   var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
+  // debug('HAPevent:', 'http://' + ipAddress + ':' + port + '/characteristics');
   hapRequest({
     eventBus: this._eventBus,
     method: 'PUT',
-    url: 'http://' + ipAddress + ':' + port + '/characteristics',
+    url: instance.url + '/characteristics',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
@@ -515,7 +517,7 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback, i
       'connection': 'keep-alive'
     },
     body: body
-  }, function(err, response) {
+  }, function (err, response) {
     // Response s/b 200 OK
 
     if (err) {
@@ -565,14 +567,14 @@ HAPNodeJSClient.prototype.HAPevent = function(ipAddress, port, body, callback, i
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callback) {
+HAPNodeJSClient.prototype.HAPresourceByDeviceID = function (deviceID, body, callback) {
   // console.log('This-0', this);
-  _mdnsLookup(deviceID, function(err, instance) {
+  _mdnsLookup(deviceID, function (err, instance) {
     // console.log('This-1', this);
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, body, function(err, response) {
+      HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, body, function (err, response) {
         if (err) {
           _mdnsError(deviceID);
         }
@@ -591,13 +593,13 @@ HAPNodeJSClient.prototype.HAPresourceByDeviceID = function(deviceID, body, callb
  * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback, instance) {
+HAPNodeJSClient.prototype.HAPresource = function (ipAddress, port, body, callback, instance) {
   var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
 
   request({
     eventBus: this._eventBus,
     method: 'POST',
-    url: 'http://' + ipAddress + ':' + port + '/resource',
+    url: instance.url + '/resource',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     encoding: null,
@@ -607,7 +609,7 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
       'connection': 'keep-alive'
     },
     body: body
-  }, function(err, response) {
+  }, function (err, response) {
     // Response s/b 200 OK
 
     if (err) {
@@ -645,14 +647,14 @@ HAPNodeJSClient.prototype.HAPresource = function(ipAddress, port, body, callback
  * @param  {type} callback  Callback to execute upon completion of characteristic getting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callback) {
+HAPNodeJSClient.prototype.HAPstatusByDeviceID = function (deviceID, body, callback) {
   // console.log('This-0', this);
-  _mdnsLookup(deviceID, function(err, instance) {
+  _mdnsLookup(deviceID, function (err, instance) {
     // console.log('This-1', this);
     if (err) {
       callback(err);
     } else {
-      HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, body, function(err, response) {
+      HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, body, function (err, response) {
         if (err) {
           _mdnsError(deviceID);
         }
@@ -671,14 +673,14 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function(deviceID, body, callbac
  * @param  {type} callback  Callback to execute upon completion of characteristic getting, function(err, response)
  */
 
-HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback, instance) {
+HAPNodeJSClient.prototype.HAPstatus = function (ipAddress, port, body, callback, instance) {
   var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
 
   // debug('HAPstatus', pin);
   request({
     eventBus: this._eventBus,
     method: 'GET',
-    url: 'http://' + ipAddress + ':' + port + '/characteristics' + body,
+    url: instance.url + '/characteristics' + body,
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
     headers: {
@@ -686,7 +688,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback, 
       'authorization': pin,
       'connection': 'keep-alive'
     }
-  }, function(err, response) {
+  }, function (err, response) {
     // Response s/b 200 OK
     // debug('HAPstatus', 'http://' + ipAddress + ':' + port + '/characteristics' + body);
     // debug('HAPstatus-1', pin);
@@ -719,7 +721,7 @@ HAPNodeJSClient.prototype.HAPstatus = function(ipAddress, port, body, callback, 
 };
 
 function _getAccessories(instance, callback) {
-  // debug('_getAccessories', filter);
+  // debug('_getAccessories', filter, instance.url + '/accessories');
   if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
     var host = instance.host + ':' + instance.port;
     var pin = _findPinByKey(host);
@@ -736,9 +738,9 @@ function _getAccessories(instance, callback) {
         'authorization': pin,
         'connection': 'keep-alive'
       }
-    }, function(err, response) {
+    }, function (err, response) {
       // Response s/b 200 OK
-      // debug('_getAccessories', response);
+      //      debug('_getAccessories', response);
       if (err || response.statusCode !== 200) {
         if (err) {
           debug('HAP Discover failed %s -> %s error %s', instance.txt.md, instance.url, err);
@@ -755,7 +757,7 @@ function _getAccessories(instance, callback) {
         }
         callback(err);
       } else {
-        // debug('_getAccessories', response.body);
+        //        debug('_getAccessories', response.body);
         try {
           var message = normalizeUUID(JSON.parse(response.body.replace(/\uFFFD/g, '')));
         } catch (err) {
