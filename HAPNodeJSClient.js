@@ -161,24 +161,30 @@ function _populateCache(timeout, discovery, callback) {
             ipAddress = address;
             url = 'http://' + ipAddress + ':' + result.port;
             break;
-          } else if (ip.isV6Format(address)) {
+          } else if (ip.isV6Format(address) && address.substring(0, 7) !== '169.254') {
             ipAddress = address;
             url = 'http://[' + ipAddress + ']:' + result.port;
+          } else {
+            debug('Invalid address found', result.name, result.addresses);
           }
         }
         // debug('result', result);
-        mdnsCache[result.txt.id] = {
-          host: ipAddress,
-          port: result.port,
-          url: url,
-          deviceID: result.txt.id,
-          txt: result.txt,
-          name: result.name
-        };
-        // debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
-        // debug('discovery', discovery);
-        if (discovery) {
-          discovery.call(this, mdnsCache[result.txt.id], function () { });
+        if (url) {
+          mdnsCache[result.txt.id] = {
+            host: ipAddress,
+            port: result.port,
+            url: url,
+            deviceID: result.txt.id,
+            txt: result.txt,
+            name: result.name
+          };
+          // debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
+          // debug('discovery', discovery);
+          if (discovery) {
+            discovery.call(this, mdnsCache[result.txt.id], function () { });
+          }
+        } else {
+          debug('No address found', result.name, result.addresses);
         }
       } else {
         debug('Unsupported device found, skipping', result.name);
