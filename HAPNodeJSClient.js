@@ -435,8 +435,7 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function (deviceID, body, callbac
       callback(err);
     } else {
       var pin = _findPinByKey(deviceID);
-      // debug("HAPeventByDeviceID", instance);
-      debug('HAPeventByDeviceID:', instance.url + '/characteristics', body);
+ //     debug('HAPeventByDeviceID:', instance.url + '/characteristics', body);
       hapRequest({
         eventBus: this._eventBus,
         method: 'PUT',
@@ -605,7 +604,7 @@ HAPNodeJSClient.prototype.HAPresource = function (ipAddress, port, body, callbac
     url: instance.url + '/resource',
     timeout: this.reqTimeout,
     maxAttempts: 5, // (default) try 5 times
-    encoding: null,
+    responseType: 'arraybuffer',
     headers: {
       'Content-Type': 'Application/json',
       'authorization': pin,
@@ -617,7 +616,7 @@ HAPNodeJSClient.prototype.HAPresource = function (ipAddress, port, body, callbac
     }
 
   }).then(function (response) {
-    debug('HAPcontrol-then', response.status, response.statusText, response.headers, response.config);
+    // debug('HAPcontrol-then', response.status, response.statusText, response.headers, response.config);
     switch (response.status) {
       case 200:
         callback(null, response.data);
