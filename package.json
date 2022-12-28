@@ -1,6 +1,6 @@
 {
   "name": "hap-node-client",
-  "version": "0.1.29",
+  "version": "0.1.30-beta.0",
   "description": "Client for Hap-NodeJS",
   "main": "HAPNodeJSClient.js",
   "directories": {
