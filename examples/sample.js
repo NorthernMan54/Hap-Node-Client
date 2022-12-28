@@ -34,7 +34,7 @@ homebridge.on('Ready', function () {
     //  homebridge.HAPcontrolByDeviceID("CC:22:3D:E3:CF:33", JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 0 }] }), function (response) { console.log('HAPcontrolByDeviceID', response, 'success is null') });
     homebridge.HAPstatusByDeviceID("CC:22:3D:E3:CF:33", "?id=9.10", function (err, response) { console.log('HAPstatusByDeviceID', response, err) });
 
-  //  homebridge.HAPresourceByDeviceID("7E:94:75:31:A2:DD", JSON.stringify({ "resource-type": "image", "image-width": 1920, "image-height": 1080 }), function (err, status) { console.log('err', err, 'status', status); });
+    homebridge.HAPresourceByDeviceID("7E:94:75:31:A2:DD", JSON.stringify({ "resource-type": "image", "image-width": 1920, "image-height": 1080 }), function (err, status) { console.log('err', err, 'status', status); });
 
   });
 });

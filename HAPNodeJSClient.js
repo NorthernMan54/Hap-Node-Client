@@ -1,13 +1,16 @@
 'use strict';
 
-const axios = require('axios');
+const axios = require('axios').default;
 var hapRequest = require('./lib/hapRequest.js');
 var EventEmitter = require('events').EventEmitter;
+const axiosRetry = require('axios-retry');
 var inherits = require('util').inherits;
 var debug = require('debug')('hapNodeJSClient');
 var bonjour = require('bonjour-hap')();
 var ip = require('ip');
 var normalizeUUID = require('./lib/util.js').normalizeUUID;
+
+axiosRetry(axios, { retries: 3 });
 
 var discovered = [];
 var mdnsCache = {};
@@ -58,6 +61,7 @@ function HAPNodeJSClient(options) {
     // this.log('DEBUG-2', namespaces);
     debugEnable.enable(namespaces);
   }
+
   this.eventRegistry = {};
   _discovery.call(this);
   this._eventBus = new EventEmitter();
@@ -164,22 +168,21 @@ function _populateCache(timeout, discovery, callback) {
           } else if (ip.isV6Format(address) && address.substring(0, 7) !== '169.254') {
             ipAddress = address;
             url = 'http://[' + ipAddress + ']:' + result.port;
+            break;
           } else {
             debug('Invalid address found', result.name, result.addresses);
+            break;
           }
         }
-        // debug('result', result);
         if (url) {
           mdnsCache[result.txt.id] = {
+            name: result.name,
             host: ipAddress,
             port: result.port,
             url: url,
             deviceID: result.txt.id,
-            txt: result.txt,
-            name: result.name
+            txt: result.txt
           };
-          // debug('HAP Device address %s -> ', result.name, mdnsCache[result.txt.id]);
-          // debug('discovery', discovery);
           if (discovery) {
             discovery.call(this, mdnsCache[result.txt.id], function () { });
           }
@@ -289,17 +292,14 @@ HAPNodeJSClient.prototype.HAPcontrolByDeviceID = function (deviceID, body, callb
  */
 
 HAPNodeJSClient.prototype.HAPcontrol = function (ipAddress, port, body, callback, instance) {
-  var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
-
   axios({
     eventBus: this._eventBus,
     method: 'PUT',
     url: instance.url + '/characteristics',
     timeout: this.reqTimeout,
-    maxAttempts: 5, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': pin,
+      'authorization': _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port),
       'connection': 'keep-alive'
     },
     data: body,
@@ -434,18 +434,16 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function (deviceID, body, callbac
     if (err) {
       callback(err);
     } else {
-      var pin = _findPinByKey(deviceID);
- //     debug('HAPeventByDeviceID:', instance.url + '/characteristics', body);
+
       hapRequest({
         eventBus: this._eventBus,
         method: 'PUT',
         deviceID: deviceID,
         url: instance.url + '/characteristics',
         timeout: this.reqTimeout,
-        maxAttempts: 5, // (default) try 5 times
         headers: {
           'Content-Type': 'Application/json',
-          'authorization': pin,
+          'authorization': _findPinByKey(deviceID),
           'connection': 'keep-alive'
         },
         body: body
@@ -505,17 +503,14 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function (deviceID, body, callbac
  */
 
 HAPNodeJSClient.prototype.HAPevent = function (ipAddress, port, body, callback, instance) {
-  var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
-  // debug('HAPevent:', 'http://' + ipAddress + ':' + port + '/characteristics');
   hapRequest({
     eventBus: this._eventBus,
     method: 'PUT',
     url: instance.url + '/characteristics',
     timeout: this.reqTimeout,
-    maxAttempts: 5, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': pin,
+      'authorization': _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port),
       'connection': 'keep-alive'
     },
     body: body
@@ -527,8 +522,8 @@ HAPNodeJSClient.prototype.HAPevent = function (ipAddress, port, body, callback, 
       callback(err);
     } else if (response.statusCode !== 207 && response.statusCode !== 204) {
       if (response.statusCode === 401 || response.statusCode === 470) {
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, err, response.body);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port), ipAddress, port, body, err, response.body);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port)));
       } else {
         debug('Homebridge event reg failed %s:%s Status: %s ', ipAddress, port, response.statusCode, body, err, response.body);
         callback(new Error('Homebridge event reg failed'));
@@ -596,18 +591,16 @@ HAPNodeJSClient.prototype.HAPresourceByDeviceID = function (deviceID, body, call
  */
 
 HAPNodeJSClient.prototype.HAPresource = function (ipAddress, port, body, callback, instance) {
-  var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
 
   axios({
     eventBus: this._eventBus,
     method: 'POST',
     url: instance.url + '/resource',
     timeout: this.reqTimeout,
-    maxAttempts: 5, // (default) try 5 times
     responseType: 'arraybuffer',
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': pin,
+      'authorization': _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port),
       'connection': 'keep-alive'
     },
     data: body,
@@ -673,7 +666,6 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function (deviceID, body, callba
  */
 
 HAPNodeJSClient.prototype.HAPstatus = function (ipAddress, port, body, callback, instance) {
-  var pin = _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port);
 
   // debug('HAPstatus', pin);
   axios({
@@ -681,10 +673,9 @@ HAPNodeJSClient.prototype.HAPstatus = function (ipAddress, port, body, callback,
     method: 'GET',
     url: instance.url + '/characteristics' + body,
     timeout: this.reqTimeout,
-    maxAttempts: 5, // (default) try 5 times
     headers: {
       'Content-Type': 'Application/json',
-      'authorization': pin,
+      'authorization': _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port),
       'connection': 'keep-alive'
     },
     validateStatus: function (status) {
@@ -720,22 +711,20 @@ function _getAccessories(instance, callback) {
   // debug('_getAccessories()', filter, instance.url + '/accessories');
   if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
     var host = instance.host + ':' + instance.port;
-    var pin = _findPinByKey(host);
 
     axios({
       eventBus: this._eventBus,
       method: 'GET',
       url: instance.url + '/accessories',
       timeout: this.reqTimeout,
-      maxAttempts: 5, // (default) try 5 times
       retryDelay: 5000, // (default) wait for 5s before trying again
       headers: {
         'Content-Type': 'Application/json',
-        'authorization': pin,
+        'authorization': _findPinByKey(instance.deviceID ? instance.deviceID : instance.host + ':' + instance.port),
         'connection': 'keep-alive'
       },
       validateStatus: function (status) {
-        return status < 500; // Resolve only if the status code is less than 500
+        return true; // Resolve only if the status code is less than 500
       }
     }).then(function (response) {
 
@@ -751,7 +740,7 @@ function _getAccessories(instance, callback) {
             callback(err);
             return;
           }
-          if (message && Object.keys(message.accessories).length > 0) {
+          if (message && Object.keys(message.accessories)) {   // && await _checkInstanceConnection(instance)
             debug('Homebridge instance discovered %s @ %s with %s accessories', instance.name, instance.url, Object.keys(message.accessories).length);
             discovered.push({
               ipAddress: instance.host,
@@ -784,5 +773,27 @@ function _getAccessories(instance, callback) {
     });
   } else {
     debug('Filtered HAP instance address: %s -> %s', instance.txt.md, instance.url);
+  }
+}
+
+/**
+ * This checks the instance pin matches
+ */
+async function _checkInstanceConnection(instance) {
+  try {
+    await axios.put(`http://${instance.host}:${instance.port}/characteristics`,
+      {
+        characteristics: [{ aid: -1, iid: -1 }],
+      },
+      {
+        headers: {
+          Authorization: _findPinByKey(instance ? instance.deviceID : instance.host + ':' + instance.port),
+        },
+      }
+    );
+    return true;
+  } catch (e) {
+    throw 'Incorrect PIN \'' + _findPinByKey(instance ? instance.deviceID : instance.host + ':' + instance.port) + '\'';
+    return false;
   }
 }

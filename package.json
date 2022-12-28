@@ -1,6 +1,6 @@
 {
   "name": "hap-node-client",
-  "version": "0.2.0-beta.0",
+  "version": "0.2.0-beta.1",
   "description": "Client for Hap-NodeJS",
   "main": "HAPNodeJSClient.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "cd scripts; node gen-hap-types.js",
-    "watch": "nodemon"
+    "test": "nodemon"
   },
   "devDependencies": {
     "documentation": "^14.0.1",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "axios": "^1.2.1",
+    "axios-retry": "^3.3.1",
     "better-queue": ">=3.8.12",
     "bonjour-hap": "^3.6.4",
     "buffer": "^6.0.3",
