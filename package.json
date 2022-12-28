@@ -7,22 +7,33 @@
     "lib": "lib"
   },
   "scripts": {
-    "build": "cd scripts; node gen-hap-types.js"
+    "build": "cd scripts; node gen-hap-types.js",
+    "watch": "nodemon"
   },
   "devDependencies": {
-    "documentation": "13.2.4",
-    "hap-nodejs": "0.9.4"
+    "documentation": "^14.0.1",
+    "hap-nodejs": "0.9.4",
+    "nodemon": "^2.0.20"
   },
   "dependencies": {
-    "better-queue": ">=3.8.10",
+    "axios": "^1.2.1",
+    "better-queue": ">=3.8.12",
     "bonjour-hap": "^3.6.4",
     "buffer": "^6.0.3",
-    "debug": ">2.6.9",
-    "extend": ">=3.0.2",
-    "ip": ">=1.1.5",
-    "once": ">=1.4.0",
-    "requestretry": "^7.0.0",
-    "request": "^2.88.2"
+    "debug": "^4.3.4",
+    "extend": "^3.0.2",
+    "ip": "^1.1.8",
+    "once": ">=1.4.0"
+  },
+  "nodemonConfig": {
+    "watch": [],
+    "ext": "js",
+    "ignore": [],
+    "exec": "node examples/sample.js",
+    "signal": "SIGTERM",
+    "env": {
+      "NODE_OPTIONS": "--trace-warnings"
+    }
   },
   "repository": {
     "type": "git",
