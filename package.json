@@ -8,11 +8,13 @@
   },
   "scripts": {
     "build": "cd scripts; node gen-hap-types.js",
-    "test": "nodemon"
+    "test": "nodemon",
+    "test-coverage": "jest --coverage"
   },
   "devDependencies": {
     "documentation": "^14.0.1",
     "hap-nodejs": "0.9.4",
+    "jest": "^29.3.1",
     "nodemon": "^2.0.20"
   },
   "dependencies": {
@@ -30,11 +32,21 @@
     "watch": [],
     "ext": "js",
     "ignore": [],
-    "exec": "node examples/sample.js",
+    "exec": "jest",
     "signal": "SIGTERM",
     "env": {
       "NODE_OPTIONS": "--trace-warnings"
     }
+  },
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "node",
+    "coverageReporters": [
+      "lcov"
+    ],
+    "collectCoverageFrom": [
+      "src/**"
+    ]
   },
   "repository": {
     "type": "git",
