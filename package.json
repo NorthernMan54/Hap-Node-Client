@@ -1,28 +1,52 @@
 {
   "name": "hap-node-client",
-  "version": "0.1.29",
+  "version": "0.2.0-beta.3",
   "description": "Client for Hap-NodeJS",
   "main": "HAPNodeJSClient.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "build": "cd scripts; node gen-hap-types.js"
+    "build": "cd scripts; node gen-hap-types.js",
+    "test": "nodemon",
+    "test-coverage": "jest --coverage"
   },
   "devDependencies": {
-    "documentation": "13.2.4",
-    "hap-nodejs": "0.9.4"
+    "documentation": "^14.0.1",
+    "hap-nodejs": "0.9.4",
+    "jest": "^29.3.1",
+    "nodemon": "^2.0.20"
   },
   "dependencies": {
-    "better-queue": ">=3.8.10",
+    "axios": "^1.2.1",
+    "axios-retry": "^3.3.1",
+    "better-queue": ">=3.8.12",
     "bonjour-hap": "^3.6.4",
     "buffer": "^6.0.3",
-    "debug": ">2.6.9",
-    "extend": ">=3.0.2",
-    "ip": ">=1.1.5",
-    "once": ">=1.4.0",
-    "requestretry": "^7.0.0",
-    "request": "^2.88.2"
+    "debug": "^4.3.4",
+    "extend": "^3.0.2",
+    "ip": "^1.1.8",
+    "once": ">=1.4.0"
+  },
+  "nodemonConfig": {
+    "watch": [],
+    "ext": "js",
+    "ignore": [],
+    "exec": "jest",
+    "signal": "SIGTERM",
+    "env": {
+      "NODE_OPTIONS": "--trace-warnings"
+    }
+  },
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "node",
+    "coverageReporters": [
+      "lcov"
+    ],
+    "collectCoverageFrom": [
+      "src/**"
+    ]
   },
   "repository": {
     "type": "git",
