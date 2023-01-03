@@ -13,6 +13,9 @@ const testAccessoryStatus = "?id=9.10";
 const testAccessoryControlOff = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 0 }] });
 const testAccessoryControlOn = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 1 }] });
 
+const testAccessoryEventFail = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 9, "ev": true }] });
+const testAccessoryEventOn = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "ev": true }] });
+
 const testResourceDeviceID = "7E:94:75:31:A2:DD";
 const testResourceMessage = JSON.stringify({ "resource-type": "image", "image-width": 1920, "image-height": 1080 });
 
@@ -31,7 +34,7 @@ describe("Constructor Test", () => {
 });
 
 
-describe("Discover Accessories", () => {
+describe("Run Tests", () => {
 
   let homebridges;
 
@@ -48,10 +51,33 @@ describe("Discover Accessories", () => {
 
         homebridges.HAPaccessories(function (endPoints) {
           // console.log("alexaDiscovery", endPoints);
+          // console.log("Test Endpoint", JSON.stringify(endPoints.find(endpoint => endpoint.deviceID === testDeviceID).accessories, null, 2));
           expect((endPoints.length > 1 ? true : false)).toEqual(true);
           done();
         });
       });
+    });
+  });
+
+  describe("HAPeventByDeviceID", () => {
+
+    test("HAPeventByDeviceID register for events - fail", done => {
+      homebridges.HAPeventByDeviceID(testDeviceID, testAccessoryEventFail, function (err, response) {
+        // console.log('HAPeventByDeviceID - fail', err, response, 'success is -70406');
+        expect(err).toBeNull();
+        // { characteristics: [ { aid: 9, iid: 9, status: -70406 } ] }
+        expect(response.characteristics[0].status).toEqual(-70406);
+      });
+      done();
+    });
+
+    test("HAPeventByDeviceID register for events", done => {
+      homebridges.HAPeventByDeviceID(testDeviceID, testAccessoryEventOn, function (err, response) {
+        // console.log('HAPeventByDeviceID', err, response, 'success is null')
+        expect(err).toBeNull();
+        expect(response).toBeNull();
+      });
+      done();
     });
   });
 
@@ -66,18 +92,6 @@ describe("Discover Accessories", () => {
       });
     });
 
-/*
-    test("HAPstatusByDeviceID with valid deviceID, but invalid body", done => {
-  
-      homebridges.HAPstatusByDeviceID(testDeviceID, "{ a: 1 }", function (err, response) {
-        console.log("HAPstatusByDeviceID", err.message, response);
-        expect(err.message).toEqual('Homebridge Status failed');
-        expect(response).toBeUndefined();
-        done();
-      });
-    });
-*/ 
-
     test("HAPstatusByDeviceID with valid deviceID, and valid body", done => {
 
       homebridges.HAPstatusByDeviceID(testDeviceID, testAccessoryStatus, function (err, response) {
@@ -88,7 +102,23 @@ describe("Discover Accessories", () => {
       });
     });
 
+    // This test will trigger a instance cache refresh, and break every thing for 20 seconds
 
+    test("HAPstatusByDeviceID with valid deviceID, but invalid body", done => {
+
+      homebridges.HAPstatusByDeviceID(testDeviceID, "{ a: 1 }", function (err, response) {
+        // console.log("HAPstatusByDeviceID", err.message, response);
+        expect(err.message).toEqual('Homebridge Status failed');
+        expect(response).toBeUndefined();
+        done();
+      });
+    });
+
+    test("Pause 21 seconds for instance cache refresh", done => {
+      setTimeout(() => {
+        done();
+      }, 21000);
+    });
   });
 
   describe("HAPcontrolByDeviceID", () => {

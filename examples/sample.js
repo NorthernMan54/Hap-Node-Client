@@ -4,6 +4,16 @@
 
 var HAPNodeJSClient = require('../HAPNodeJSClient.js').HAPNodeJSClient;
 
+const testDeviceID = "CC:22:3D:E3:CF:33";
+const testAccessoryStatus = "?id=9.10";
+const testAccessoryControlOff = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 0 }] });
+const testAccessoryControlOn = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 1 }] });
+
+const testAccessoryEventOn = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "ev": true }] });
+
+const testResourceDeviceID = "7E:94:75:31:A2:DD";
+const testResourceMessage = JSON.stringify({ "resource-type": "image", "image-width": 1920, "image-height": 1080 });
+
 var options = {
   // clientId: this.username,
   debug: true,
@@ -24,27 +34,23 @@ homebridge.on('Ready', function () {
     var count = 0;
     endPoints.forEach(function (entry) {
       count += entry.accessories.accessories.length;
-      // console.log('sample - ', entry.accessories.accessories.length);
     });
     console.log('total - ', count);
-    //    console.log('sample - ', JSON.stringify(endPoints[5], null, 2));
-    homebridge.HAPeventByDeviceID("CC:22:3D:E3:CF:33", JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "ev": true }] }), function (response) { console.log('HAPeventByDeviceID', response, 'success is null') });
 
-    homebridge.HAPcontrolByDeviceID("CC:22:3D:E3:CF:33", JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 1 }] }), function (response) { console.log('HAPcontrolByDeviceID', response, 'success is null') });
-    //  homebridge.HAPcontrolByDeviceID("CC:22:3D:E3:CF:33", JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 0 }] }), function (response) { console.log('HAPcontrolByDeviceID', response, 'success is null') });
-    homebridge.HAPstatusByDeviceID("CC:22:3D:E3:CF:33", "?id=9.10", function (err, response) { console.log('HAPstatusByDeviceID', response, err) });
+    homebridge.HAPeventByDeviceID(testDeviceID, testAccessoryEventOn, function (response) { console.log('HAPeventByDeviceID', response, 'success is null') });
 
-    homebridge.HAPresourceByDeviceID("7E:94:75:31:A2:DD", JSON.stringify({ "resource-type": "image", "image-width": 1920, "image-height": 1080 }), function (err, status) { console.log('err', err, 'status', status); });
+    homebridge.HAPcontrolByDeviceID(testDeviceID, testAccessoryControlOn, function (response) { console.log('HAPcontrolByDeviceID', response, 'success is null') });
+    homebridge.HAPcontrolByDeviceID(testDeviceID, testAccessoryControlOff, function (response) { console.log('HAPcontrolByDeviceID', response, 'success is null') });
+
+    homebridge.HAPstatusByDeviceID(testDeviceID, testAccessoryStatus, function (err, response) { console.log('HAPstatusByDeviceID', response, err) });
+
+    homebridge.HAPresourceByDeviceID(testResourceDeviceID, testResourceMessage, function (err, status) { console.log('err', err, 'status', status); });
+
+ // This will trigger a device cache cleanup, and any calls within the next 20 seconds will fail.
+
+    homebridge.HAPstatusByDeviceID(testDeviceID, "{ a: 1 }", function (err, response) {
+      console.log("HAPstatusByDeviceID - should fail", err.message, response);
+    });
 
   });
 });
-
-/*
-
-Dec 27 21:43:02 jesse node-red-pi[958]: hapNodeRed Control 7E:94:75:31:A2:DD -> {"resource-type":"image","image-width":1920,"image-height":1080}
-Dec 27 21:43:02 jesse homebridge[8450]: [Camera-ffmpeg] Snapshot from Shed at 1920:1080
-Dec 27 21:43:04 jesse node-red-pi[958]: hapNodeRed Controlled 7E:94:75:31:A2:DD -> 1672195382446
-homebridge.HAPresourceByDeviceID(device.id, JSON.stringify(message), function (err, status)
-
-
-*/
