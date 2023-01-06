@@ -165,9 +165,10 @@ function _populateCache(timeout, discovery, callback) {
             ipAddress = address;
             url = 'http://' + ipAddress + ':' + result.port;
             break;    // prefer ipv4
-          } else if (ip.isV6Format(address) && address.substring(0, 7) !== '169.254') {
-            ipAddress = address;
-            url = 'http://[' + ipAddress + ']:' + result.port;
+          } else if (ip.isV6Format(address) && address.substring(0, 7) !== '169.254' && address.substring(0, 6) !== 'fe80::') {
+            // ipv6 with Axios is broken on MacOS - 
+            // ipAddress = address;
+            // url = 'http://[' + ipAddress + ']:' + result.port;
           } else {
             debug('Invalid address found', result.name, address, result.addresses);
           }
