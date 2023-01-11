@@ -316,8 +316,8 @@ HAPNodeJSClient.prototype.HAPcontrol = function (ipAddress, port, body, callback
         break;
       case 401:
       case 470:
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, response.data);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port), ipAddress, port, body, response.data);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port)));
         break;
       default:
         debug('Homebridge Control failed %s:%s Status: %s ', ipAddress, port, response.status, body, response.data);
@@ -455,9 +455,9 @@ HAPNodeJSClient.prototype.HAPeventByDeviceID = function (deviceID, body, callbac
           callback(err);
         } else if (response.statusCode !== 207 && response.statusCode !== 204) {
           if (response.statusCode === 401 || response.statusCode === 470) {
-            debug('Homebridge auth failed, invalid PIN %s', pin, deviceID, body, err, response.body);
+            debug('Homebridge auth failed, invalid PIN %s', _findPinByKey(deviceID), deviceID, body, err, response.body);
             _mdnsError(deviceID);
-            callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
+            callback(new Error('Homebridge auth failed, invalid PIN ' + _findPinByKey(deviceID)));
           } else {
             debug('Homebridge event reg failed %s:%s Status: %s ', deviceID, response.statusCode, body, err, response.body);
             _mdnsError(deviceID);
@@ -615,8 +615,8 @@ HAPNodeJSClient.prototype.HAPresource = function (ipAddress, port, body, callbac
         break;
       case 401:
       case 470:
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, response.data);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port), ipAddress, port, body, response.data);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port)));
         break;
       default:
         debug('Homebridge Resource failed %s:%s Status: %s ', ipAddress, port, response.status, body, response.data);
@@ -666,7 +666,6 @@ HAPNodeJSClient.prototype.HAPstatusByDeviceID = function (deviceID, body, callba
 
 HAPNodeJSClient.prototype.HAPstatus = function (ipAddress, port, body, callback, instance) {
 
-  // debug('HAPstatus', pin);
   axios({
     eventBus: this._eventBus,
     method: 'GET',
@@ -691,8 +690,8 @@ HAPNodeJSClient.prototype.HAPstatus = function (ipAddress, port, body, callback,
         break;
       case 401:
       case 470:
-        debug('Homebridge auth failed, invalid PIN %s %s:%s', pin, ipAddress, port, body, response.data);
-        callback(new Error('Homebridge auth failed, invalid PIN ' + pin));
+        debug('Homebridge auth failed, invalid PIN %s %s:%s', _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port), ipAddress, port, body, response.data);
+        callback(new Error('Homebridge auth failed, invalid PIN ' + _findPinByKey(instance ? instance.deviceID : ipAddress + ':' + port)));
         break;
       default:
         debug('Homebridge Status failed %s:%s Status: %s ', ipAddress, port, response.status, body, response.data);
