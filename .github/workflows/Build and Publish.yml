@@ -36,11 +36,11 @@ jobs:
 
   publish_test:
     needs: get_tags
-    name: Publish Test Version - ${{ needs.get_tags.outputs.TARGET_IMAGE_TAG }}
+    name: Publish Test Version - ${{ needs.get_tags.outputs.BRANCH_NAME }}
     if: ${{ needs.get_tags.outputs.BRANCH_NAME != 'main' }}
     uses: homebridge/.github/.github/workflows/npm-publish.yml@latest
     with:
-      tag: ${{ needs.get_tags.outputs.TARGET_IMAGE_TAG }}
+      tag: ${{ needs.get_tags.outputs.BRANCH_NAME }}
       dynamically_adjust_version: true
       npm_version_command: 'pre'
       pre_id: ${{ needs.get_tags.outputs.TARGET_IMAGE_TAG }}
