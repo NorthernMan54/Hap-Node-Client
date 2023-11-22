@@ -29,24 +29,16 @@ jobs:
         echo $TARGET_IMAGE_TAG
         echo "TARGET_IMAGE_TAG=${TARGET_IMAGE_TAG}" >> $GITHUB_OUTPUT
 
-    # generate the alternative image tag
-    - name: Get Alternate Tag
-      id: get_alt_tag
-      run: |
-        export ALT_IMAGE_TAG=$(if [ "${{ steps.get_branch.outputs.BRANCH_NAME }}" = "main" ]; then echo "ubuntu"; else echo "${{ steps.get_branch.outputs.BRANCH_NAME }}-ubuntu"; fi)
-        echo $ALT_IMAGE_TAG
-        echo "ALT_IMAGE_TAG=${ALT_IMAGE_TAG}" >> $GITHUB_OUTPUT
-
   publish_test:
     needs: get_tags
     name: Publish Test Version - ${{ needs.get_tags.outputs.TARGET_IMAGE_TAG }}
     if: ${{ needs.get_tags.outputs.BRANCH_NAME != 'main' }}
     uses: homebridge/.github/.github/workflows/npm-publish.yml@latest
     with:
-      tag: ${TARGET_IMAGE_TAG}
+      tag: ${{ needs.get_tags.outputs.TARGET_IMAGE_TAG }}
       dynamically_adjust_version: true
       npm_version_command: 'pre'
-      pre_id: ${TARGET_IMAGE_TAG}
+      pre_id: ${{ needs.get_tags.outputs.TARGET_IMAGE_TAG }}
     secrets:
           npm_auth_token: ${{ secrets.npm_token }}
 
