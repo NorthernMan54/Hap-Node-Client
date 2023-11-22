@@ -30,8 +30,9 @@ jobs:
         echo "TARGET_IMAGE_TAG=${TARGET_IMAGE_TAG}" >> $GITHUB_OUTPUT
 
     outputs:
-      TARGET_IMAGE_TAG: ${{ steps.get_branch.outputs.TARGET_IMAGE_TAG }}
       BRANCH_NAME: ${{ steps.get_branch.outputs.BRANCH_NAME }}
+      TARGET_IMAGE_TAG: ${{ steps.get_tag.outputs.TARGET_IMAGE_TAG }}
+
 
 
   publish_test:
