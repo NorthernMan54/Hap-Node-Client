@@ -56,7 +56,7 @@ jobs:
 
   publish_github_release:
     name: Publish Github Release
-    needs: get_tags
+    needs: publish_release
     if: ${{ needs.get_tags.outputs.BRANCH_NAME == 'main' }}
     runs-on: ubuntu-latest
     steps:
