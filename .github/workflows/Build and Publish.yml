@@ -56,13 +56,18 @@ jobs:
 
   publish_github_release:
     name: Publish Github Release
-    needs: publish_release
+    needs: get_tags
+    if: ${{ needs.get_tags.outputs.BRANCH_NAME == 'main' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Release
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+      - name: Release - ${{ steps.package-version.outputs.current-version}}
         uses: softprops/action-gh-release@v2
         with: 
           generate_release_notes: true
           draft: false
+          tag_name: ${{ steps.package-version.outputs.current-version}}
