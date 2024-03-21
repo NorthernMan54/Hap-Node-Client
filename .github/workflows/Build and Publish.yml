@@ -53,3 +53,10 @@ jobs:
       pre_id: ${{ needs.get_tags.outputs.TARGET_IMAGE_TAG }}
     secrets:
           npm_auth_token: ${{ secrets.npm_token }}
+
+  publish_github_release:
+    needs: publish_release
+    uses: softprops/action-gh-release@v2
+    with: 
+      generate_release_notes: true
+      draft: false
