@@ -310,4 +310,7 @@ describe("Incorrect PIN", () => {
       });
     });
   });
+  afterAll(async () => {
+    await homebridges.destroy();
+  }, 30000);
 });
