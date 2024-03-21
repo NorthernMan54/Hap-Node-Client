@@ -1,4 +1,4 @@
-name: "Build"
+name: "Build and Publish"
 
 on:
   push:
@@ -55,6 +55,7 @@ jobs:
           npm_auth_token: ${{ secrets.npm_token }}
 
   publish_github_release:
+    needs: publish_release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
