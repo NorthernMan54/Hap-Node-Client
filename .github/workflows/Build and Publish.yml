@@ -31,7 +31,7 @@ jobs:
       BRANCH_NAME: ${{ steps.get_branch.outputs.BRANCH_NAME }}
       TARGET_IMAGE_TAG: ${{ steps.get_tag.outputs.TARGET_IMAGE_TAG }}
 
-  publish_release:
+  publish_prod_release:
     needs: get_tags
     name: Publish Release Version
     if: ${{ needs.get_tags.outputs.BRANCH_NAME == 'main' }}
@@ -55,19 +55,17 @@ jobs:
           npm_auth_token: ${{ secrets.npm_token }}
 
   publish_github_release:
-    name: Publish Github Release
-    needs: publish_release
-    if: ${{ needs.get_tags.outputs.BRANCH_NAME == 'main' }}
+    needs: [publish_prod_release]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-      - name: Release - ${{ steps.package-version.outputs.current-version}}
-        uses: softprops/action-gh-release@v2
-        with: 
-          generate_release_notes: true
-          draft: false
-          tag_name: ${{ steps.package-version.outputs.current-version}}
+    - uses: actions/checkout@v4
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ needs.publish_prod_release.outputs.NPM_VERSION }}
+        name: Release ${{ needs.publish_prod_release.outputs.NPM_VERSION }}
+        generate_release_notes: true
+        draft: false
+        prerelease: false
