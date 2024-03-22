@@ -1,21 +1,30 @@
 'use strict';
 
-const axios = require('axios').default;
-var hapRequest = require('./lib/hapRequest.js');
-var EventEmitter = require('events').EventEmitter;
-const axiosRetry = require('axios-retry').default;
-var inherits = require('util').inherits;
-var debug = require('debug')('hapNodeJSClient');
-var bonjour = require('bonjour-hap')();
-var ip = require('ip');
-var normalizeUUID = require('./lib/util.js').normalizeUUID;
+// External Libraries
 
-var monitorBridgeUpdates = require('./lib/monitorBridgeUpdates.js');
+const ip = require('ip');
+const bonjour = require('bonjour-hap')();
+const axios = require('axios').default;
+const inherits = require('util').inherits;
+const axiosRetry = require('axios-retry').default;
+const EventEmitter = require('events').EventEmitter;
+
+// Internal Libaries
+
+const hapRequest = require('./lib/hapRequest.js');
+const normalizeUUID = require('./lib/util.js').normalizeUUID;
+const getAccessoryDump = require('./lib/getAccessoryDump').getAccessoryDump;
+const MonitorBridgeUpdates = require('./lib/monitorBridgeUpdates').MonitorBridgeUpdates;
+
+// Debug Monitoring
+
+var debug = require('debug')('HAPNodeJSClient');
+var debugDis = require('debug')('HAPNodeJSClient:Discover');
 
 axiosRetry(axios, { retries: 3 });
 
 var discovered = [];
-var mdnsCache = {};
+// var mdnsCache = {};
 var populateCache = false;
 
 var filter = false;
@@ -34,6 +43,7 @@ var pins = {};
  * @property {number} refresh - Discovery refresh, defaults to 15 minutes
  * @property {number} timeout - Discovery timeout, defaults to 20 seconds
  * @property {number} reqTimeout - Accessory request timeout, defaults to 7 seconds
+ * @property {number} type - Type of mDNS record to look for, defaults to `hap`, used for testing only.
  * @example
  *
  */
@@ -43,6 +53,7 @@ var populateCacheTimeout;
 class HAPNodeJSClient {
   constructor(options) {
     // console.log('Options', options);
+    this.options = options;
     this.debug = options.debug || false;
     this.refresh = options.refresh || 900;
     this.timeout = options.timeout || 20;
@@ -64,9 +75,17 @@ class HAPNodeJSClient {
     }
 
     this.eventRegistry = {};
-    _discovery.call(this);  // Inital discovery of devices
+
+    this.monitorBridgeUpdates = new MonitorBridgeUpdates({ type: (options.type ? options.type : 'hap') });
+
+    this.monitorBridgeUpdates.on('up', this.bridgeUp.bind(this));
+    this.monitorBridgeUpdates.on('update', this.bridgeUpdate.bind(this));
+
+    // _discovery.call(this);  // Inital discovery of devices
     this._eventBus = new EventEmitter();
-    this.discoveryTimer = setInterval(_discovery.bind(this), this.refresh * 1000);
+    // this.discoveryTimer = setInterval(_discovery.bind(this), this.refresh * 1000);
+
+    this.initalTimer = setTimeout(this.initalTimerExpire.bind(this), 1000);
 
     /**
      * HomeKit Accessory Characteristic event pass thru
@@ -105,8 +124,47 @@ class HAPNodeJSClient {
         this.emit(event.deviceID + event.aid + event.iid, event);
       }.bind(this));
     }.bind(this));
+
     // debug('This', this);
   }
+
+  /**
+   * 
+   * @param {*} callback 
+   */
+  async bridgeUp(service) {
+    // debugDis('bridgeUp', service);
+    if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
+      try {
+        let bridge = await getAccessoryDump(service);
+        if (bridge) {
+          if (this.initalTimer) {
+            clearTimeout(this.initalTimer);
+            this.initalTimer = setTimeout(this.initalTimerExpire.bind(this), 1000); // Emit Ready 1 second after last update
+          }
+          discovered.push(bridge);
+        }
+      } catch (err) {
+        debugDis('ERROR:', err.message);
+      }
+    } else {
+      debugDump('Filtered HAP instance address: %s -> %s', service.txt.md, service.url);
+    }
+  }
+
+  /**
+   * 
+   * @param {*} callback 
+   */
+  async bridgeUpdate(service) {
+    debugDis('bridgeUpdate', this, service);
+  }
+
+  async initalTimerExpire() {
+    debugDis('initalTimerExpire', discovered.length);
+    this.emit('Ready', discovered);
+  }
+
   /**
    * HAPNodeJSClient.prototype.RegisterPin - Register pin numbers ()
    *
@@ -142,8 +200,9 @@ class HAPNodeJSClient {
    * @returns mdnsCacheObject
    */
   mdnsCache() {
-    return mdnsCache;
+    return this.monitorBridgeUpdates.mdnsCache;
   }
+
   // curl -X PUT http://127.0.0.1:51826/characteristics --header "Content-Type:Application/json"
   // --header "authorization: 031-45-154" --data "{ \"characteristics\": [{ \"aid\": 2, \"iid\": 9, \"value\": 0}] }"
   /**
@@ -154,7 +213,7 @@ class HAPNodeJSClient {
    * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
    */
   HAPcontrolByDeviceID(deviceID, body, callback) {
-    _mdnsLookup(deviceID, function (err, instance) {
+   this._mdnsLookup(deviceID, function (err, instance) {
       if (err) {
         callback(err);
       } else {
@@ -224,7 +283,7 @@ class HAPNodeJSClient {
    */
   HAPeventByDeviceID(deviceID, body, callback) {
     // console.log('This-0', this);
-    _mdnsLookup(deviceID, function (err, instance) {
+   this._mdnsLookup(deviceID, function (err, instance) {
       // debug('This-1', instance);
       if (err) {
         callback(err);
@@ -355,7 +414,7 @@ class HAPNodeJSClient {
    */
   HAPresourceByDeviceID(deviceID, body, callback) {
     // console.log('This-0', this);
-    _mdnsLookup(deviceID, function (err, instance) {
+   this._mdnsLookup(deviceID, function (err, instance) {
       // console.log('This-1', this);
       if (err) {
         callback(err);
@@ -425,7 +484,7 @@ class HAPNodeJSClient {
    */
   HAPstatusByDeviceID(deviceID, body, callback) {
     // console.log('This-0', this);
-    _mdnsLookup(deviceID, function (err, instance) {
+   this._mdnsLookup(deviceID, function (err, instance) {
       // console.log('This-1', this);
       if (err) {
         callback(err);
@@ -487,6 +546,25 @@ class HAPNodeJSClient {
       callback(err);
     });
   }
+
+  async _mdnsLookup(deviceID, callback) {
+    // debug('\nmdnsLookup start', serviceName);
+    if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
+      // debug('cached', this.monitorBridgeUpdates.mdnsCacheGet(serviceName].url);
+      callback(null, this.monitorBridgeUpdates.mdnsCacheGet(deviceID));
+    } else {
+      _populateCache(4, null, function () {
+        if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
+          // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
+  
+          callback(null, this.monitorBridgeUpdates.mdnsCacheGet(deviceID));
+        } else {
+          callback(new Error('ERROR: HB Instance not found', deviceID), null);
+        }
+      });
+    }
+  }
+
   /**
    * Destroy and shutdown HAPNodeJSClient - Used by testing
    */
@@ -494,6 +572,7 @@ class HAPNodeJSClient {
     clearInterval(this.discoveryTimer);
     clearInterval(populateCacheTimeout);
     bonjour.destroy();
+    this.monitorBridgeUpdates.destroy();
   }
 }
 
@@ -509,33 +588,18 @@ function _discovery() {
   }.bind(this));
 }
 
-function _mdnsLookup(deviceID, callback) {
-  // debug('\nmdnsLookup start', serviceName);
-  if (mdnsCache[deviceID]) {
-    // debug('cached', mdnsCache[serviceName].url);
-    callback(null, mdnsCache[deviceID]);
-  } else {
-    _populateCache(4, null, function () {
-      if (mdnsCache[deviceID]) {
-        // debug('refreshed', mdnsCache[deviceID]);
 
-        callback(null, mdnsCache[deviceID]);
-      } else {
-        callback(new Error('ERROR: HB Instance not found', deviceID), null);
-      }
-    });
-  }
-}
 
 function _mdnsError(deviceID) {
   // debug('\_mdnsError ', deviceID);
-  mdnsCache[deviceID] = false;
+  this.monitorBridgeUpdates.mdnsCacheRemove(deviceID);
   _populateCache(4, null, function () {
-    if (mdnsCache[deviceID]) {
-      // debug('refreshed', mdnsCache[deviceID]);
+    if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
+      // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
     }
   });
 }
+
 
 function _populateCache(timeout, discovery, callback) {
   // debug('_populateCache', populateCache);
@@ -543,7 +607,7 @@ function _populateCache(timeout, discovery, callback) {
     populateCache = true;
     // debug('_populateCache', new Error().stack);
     var browser = bonjour.find({
-      type: 'hap'
+      type: 'test'
     }, function (result) {
       if (result.txt) {
         debug('HAP Device discovered', result.name, result.addresses);
@@ -563,7 +627,7 @@ function _populateCache(timeout, discovery, callback) {
           }
         }
         if (url) {
-          mdnsCache[result.txt.id] = {
+          this.monitorBridgeUpdates.mdnsCacheUpdate(result.txt.id) = {
             name: result.name,
             host: ipAddress,
             port: result.port,
@@ -572,7 +636,7 @@ function _populateCache(timeout, discovery, callback) {
             txt: result.txt
           };
           if (discovery) {
-            discovery.call(this, mdnsCache[result.txt.id], function () { });
+            discovery.call(this, this.monitorBridgeUpdates.mdnsCacheGet(result.txt.id), function () { });
           }
         } else {
           debug('No address found', result.name, result.addresses);

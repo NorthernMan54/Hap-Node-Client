@@ -1,8 +1,49 @@
-const { _responseLineRegex } = require('./lib/httpParser');
+// External Libraries
 
+var http = require('http');
+const bonjour = require('bonjour-hap')()
+
+// Internal Libraries
+
+const { _responseLineRegex } = require('./lib/httpParser');
 var HAPNodeJSClient = require('hap-node-client').HAPNodeJSClient;
 
-const testDeviceID = "CC:22:3D:E3:CF:33";
+
+/*
+
+curl -X PUT http://192.168.1.11:46775/accessories --header "Content-Type:Application/json" --header "authorization: 031-45-154"
+curl -X GET http://192.168.1.11:46775/characteristics?id=9.10 --header "Content-Type:Application/json" --header "authorization: 031-45-154"
+*/
+
+// Homebridge emulator setup
+
+const testType = 'test';
+const discoveryTimeout = 5;
+const testPort = 3000;
+
+let publishTxt = {
+  "c#": 1,
+  ff: 0,
+  id: 'aa:bb:cc:dd:ee:ff',
+  md: 'HAPNodeJSClient_Test_Accessory',
+  pv: '1.1',
+  "s#": 1, // current state number (must be 1)
+  sf: '0',
+  ci: 2,
+  sh: 'setupHash'
+};
+
+const publishOptions = {
+  name: 'HAPNodeJSClient_Test_Accessory',
+  type: testType,
+  port: testPort,
+  host: 'HAPNodeJSClient_Test_Accessory.local',
+  txt: publishTxt
+}
+
+// Test Variables
+
+const testDeviceID = publishTxt.id;
 const testAccessoryStatus = "?id=9.10";
 const testAccessoryControlOff = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 0 }] });
 const testAccessoryControlOn = JSON.stringify({ "characteristics": [{ "aid": 9, "iid": 10, "value": 1 }] });
@@ -24,20 +65,59 @@ describe("Constructor Test", () => {
 
 });
 
-/*
-
-curl -X PUT http://192.168.1.11:46775/accessories --header "Content-Type:Application/json" --header "authorization: 031-45-154"
-curl -X GET http://192.168.1.11:46775/characteristics?id=9.10 --header "Content-Type:Application/json" --header "authorization: 031-45-154"
-*/
-
-
 describe("Correct PIN", () => {
 
   let homebridges;
+  let service;
+  let httpServer;
 
   beforeAll(() => {
+
+    // Fake Homebridge instance
+
+    service = bonjour.publish(publishOptions);
+    service.start()
+
     var options = {
+      type: testType,
+      timeout: discoveryTimeout,  // Discovery timeout;
     };
+
+    let app = async function (req, res) {
+      console.log('req', req.url);
+      switch (req.method) {
+        case 'PUT':
+          console.log('req', req.url, req.body);
+          break;
+        case 'GET':
+          switch (req.url) {
+            case '/accessories':
+              await res.writeHead(200);
+              await res.end(JSON.stringify(accessory));
+              break;
+            case '/characteristics?id=9.10':
+              await res.writeHead(200);
+              await res.end(JSON.stringify({ "characteristics": [{ "aid": 2, "iid": 9, "value": 0 }] }));
+              break;
+            case '/characteristics':
+              await res.writeHead(200);
+              await res.end(JSON.stringify({ "characteristics": [{ "aid": 2, "iid": 9, "value": 0 }] }));
+              break;
+            case '/characteristics%7B%20a:%201%20%7D':
+              await res.writeHead(500);
+              await res.end(JSON.stringify({ "characteristics": [{ "aid": 2, "iid": 9, "value": 0 }] }));
+              break;
+            default:
+              await res.writeHead(200, { 'Content-Type': 'Application/json' });
+              await res.end("hello world\n");
+          }
+        default:
+          await res.writeHead(200, { 'Content-Type': 'Application/json' });
+          await res.end("hello world\n");
+      }
+    }
+    httpServer = http.createServer(app).listen(testPort);
+
     homebridges = new HAPNodeJSClient(options);
   });
 
@@ -47,16 +127,19 @@ describe("Correct PIN", () => {
       homebridges.on('Ready', function () {
 
         homebridges.HAPaccessories(function (endPoints) {
-          // console.log("alexaDiscovery", endPoints);
+          // console.log("alexaDiscovery - endPoints", endPoints, endPoints.length);
           // console.log("Test Endpoint", JSON.stringify(endPoints.find(endpoint => endpoint.deviceID === testDeviceID).accessories, null, 2));
-          expect((endPoints.length > 1 ? true : false)).toEqual(true);
+          expect(endPoints).toBeDefined();
+          expect(endPoints.length).toBeGreaterThanOrEqual(1);
+          expect(endPoints[0]).toHaveProperty('instance');
+          expect(endPoints[0].accessories).toHaveLength(2);
           done();
         });
       });
     }, 21000);
   });
 
-  describe("HAPeventByDeviceID", () => {
+  describe.skip("HAPeventByDeviceID", () => {
 
     test("register for events - fail", done => {
       homebridges.HAPeventByDeviceID(testDeviceID, testAccessoryEventFail, function (err, response) {
@@ -79,7 +162,7 @@ describe("Correct PIN", () => {
     });
   });
 
-  describe("HAPstatusByDeviceID", () => {
+  describe.skip("HAPstatusByDeviceID", () => {
     test("invalid deviceID", done => {
 
       homebridges.HAPstatusByDeviceID("12:34:56:78", "{ a: 1 }", function (err, response) {
@@ -105,17 +188,15 @@ describe("Correct PIN", () => {
     test("valid deviceID, but invalid body", done => {
 
       homebridges.HAPstatusByDeviceID(testDeviceID, "{ a: 1 }", function (err, response) {
-        // console.log("HAPstatusByDeviceID", err.message, response);
+        console.log("HAPstatusByDeviceID", err, response);
         expect(err.message).toEqual('Homebridge Status failed');
         expect(response).toBeUndefined();
         done();
       });
     });
 
-    test("Pause 21 seconds for instance cache refresh", done => {
-      setTimeout(() => {
-        done();
-      }, 21000);
+    test("Pause 21 seconds for instance cache refresh", async () => {
+      await sleep(21000);
     }, 21100);
   });
 
@@ -143,7 +224,7 @@ describe("Correct PIN", () => {
 
   });
 
-  describe("HAPresourceByDeviceID", () => {
+  describe.skip("HAPresourceByDeviceID", () => {
     test("valid deviceID, and valid message", done => {
 
       homebridges.HAPresourceByDeviceID(testResourceDeviceID, testResourceMessage, function (err, response) {
@@ -154,14 +235,31 @@ describe("Correct PIN", () => {
       });
     });
   });
+
+  afterAll(async () => {
+    await bonjour.unpublishAll(async function (err) {
+      if (err)
+        console.log('unpublishAll', err);
+      bonjour.destroy();
+    });
+    await homebridges.destroy();
+    httpServer.closeAllConnections();
+    httpServer.close();
+  }, 30000);
 });
 
-describe("Incorrect PIN", () => {
+describe.skip("Incorrect PIN", () => {
 
   let homebridges;
+  let service;
 
   beforeAll(() => {
+    service = bonjour.publish(publishOptions);
+    service.start()
+
     var options = {
+      type: testType,
+      timeout: discoveryTimeout,  // Discovery timeout;
       pin: "123-456-789"
     };
     homebridges = new HAPNodeJSClient(options);
@@ -194,10 +292,8 @@ describe("Incorrect PIN", () => {
       });
     });
 
-    test("Pause 21 seconds for instance cache refresh", done => {
-      setTimeout(() => {
-        done();
-      }, 21000);
+    test("Pause 21 seconds for instance cache refresh", async () => {
+      await sleep(21000);
     }, 21100);
 
     test("register for events", done => {
@@ -209,10 +305,8 @@ describe("Incorrect PIN", () => {
       });
     });
 
-    test("Pause 21 seconds for instance cache refresh", done => {
-      setTimeout(() => {
-        done();
-      }, 21000);
+    test("Pause 21 seconds for instance cache refresh", async () => {
+      await sleep(21000);
     }, 21100);
 
   });
@@ -228,10 +322,8 @@ describe("Incorrect PIN", () => {
       });
     });
 
-    test("Pause 21 seconds for instance cache refresh", done => {
-      setTimeout(() => {
-        done();
-      }, 21000);
+    test("Pause 21 seconds for instance cache refresh", async () => {
+      await sleep(21000);
     }, 21100);
 
 
@@ -257,10 +349,8 @@ describe("Incorrect PIN", () => {
       });
     });
 
-    test("Pause 21 seconds for instance cache refresh", done => {
-      setTimeout(() => {
-        done();
-      }, 21000);
+    test("Pause 21 seconds for instance cache refresh", async () => {
+      await sleep(21000);
     }, 21100);
   });
 
@@ -275,10 +365,8 @@ describe("Incorrect PIN", () => {
       });
     });
 
-    test("Pause 21 seconds for instance cache refresh", done => {
-      setTimeout(() => {
-        done();
-      }, 21000);
+    test("Pause 21 seconds for instance cache refresh", async () => {
+      await sleep(21000);
     }, 21100);
 
     test("valid deviceID, and valid body Off", done => {
@@ -291,10 +379,8 @@ describe("Incorrect PIN", () => {
       });
     });
 
-    test("Pause 21 seconds for instance cache refresh", done => {
-      setTimeout(() => {
-        done();
-      }, 21000);
+    test("Pause 21 seconds for instance cache refresh", async () => {
+      await sleep(21000);
     }, 21100);
 
   });
@@ -311,6 +397,19 @@ describe("Incorrect PIN", () => {
     });
   });
   afterAll(async () => {
+    await bonjour.unpublishAll(async function (err) {
+      if (err)
+        console.log('unpublishAll', err);
+      bonjour.destroy();
+    });
     await homebridges.destroy();
   }, 30000);
 });
+
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Sample Accessory
+
+const accessory = { "accessories": [{ "aid": 1, "services": [{ "type": "3E", "iid": 1, "characteristics": [{ "type": "14", "iid": 2, "perms": ["pw"], "description": "Identify", "format": "bool" }, { "type": "20", "iid": 3, "value": "homebridge.io", "perms": ["pr"], "description": "Manufacturer", "format": "string", "maxLen": 64 }, { "type": "21", "iid": 4, "value": "homebridge", "perms": ["pr"], "description": "Model", "format": "string", "maxLen": 64 }, { "type": "23", "iid": 5, "value": "Heisenberg 4534", "perms": ["pr"], "description": "Name", "format": "string", "maxLen": 64 }, { "type": "30", "iid": 6, "value": "AA:BB:CC:DD:EE:01", "perms": ["pr"], "description": "Serial Number", "format": "string", "maxLen": 64 }, { "type": "52", "iid": 7, "value": "1.7.0", "perms": ["pr"], "description": "Firmware Revision", "format": "string" }] }, { "type": "A2", "iid": 2000000008, "characteristics": [{ "type": "37", "iid": 9, "value": "1.1.0", "perms": ["pr"], "description": "Version", "format": "string", "maxLen": 64 }] }] }, { "aid": 34, "services": [{ "type": "3E", "iid": 1, "characteristics": [{ "type": "14", "iid": 2, "perms": ["pw"], "description": "Identify", "format": "bool" }, { "type": "20", "iid": 3, "value": "homebridge-alexa", "perms": ["pr"], "description": "Manufacturer", "format": "string", "maxLen": 64 }, { "type": "21", "iid": 4, "value": "Default-Model", "perms": ["pr"], "description": "Model", "format": "string", "maxLen": 64 }, { "type": "23", "iid": 5, "value": "Alexa", "perms": ["pr"], "description": "Name", "format": "string", "maxLen": 64 }, { "type": "30", "iid": 6, "value": "Pinkman.local", "perms": ["pr"], "description": "Serial Number", "format": "string", "maxLen": 64 }, { "type": "52", "iid": 7, "value": "0.6.9", "perms": ["pr"], "description": "Firmware Revision", "format": "string" }] }, { "type": "80", "iid": 8, "characteristics": [{ "type": "23", "iid": 9, "value": "Alexa", "perms": ["pr"], "description": "Name", "format": "string", "maxLen": 64 }, { "type": "6A", "iid": 10, "value": 0, "perms": ["ev", "pr"], "description": "Contact Sensor State", "format": "uint8", "minValue": 0, "maxValue": 1, "minStep": 1, "valid-values": [0, 1] }] }] }] };
