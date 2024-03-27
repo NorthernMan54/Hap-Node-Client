@@ -5,9 +5,9 @@
 const ip = require('ip');
 const bonjour = require('bonjour-hap')();
 const axios = require('axios').default;
-const inherits = require('util').inherits;
+const inherits = require('node:util').inherits;
 const axiosRetry = require('axios-retry').default;
-const EventEmitter = require('events').EventEmitter;
+const EventEmitter = require('node:events').EventEmitter;
 
 // Internal Libaries
 
@@ -85,7 +85,7 @@ class HAPNodeJSClient {
     this._eventBus = new EventEmitter();
     // this.discoveryTimer = setInterval(_discovery.bind(this), this.refresh * 1000);
 
-    this.initalTimer = setTimeout(this.initalTimerExpire.bind(this), 1000);
+    this.initalTimer = setTimeout(this.initalTimerExpire.bind(this), 2000);
 
     /**
      * HomeKit Accessory Characteristic event pass thru
@@ -133,22 +133,13 @@ class HAPNodeJSClient {
    * @param {*} callback 
    */
   async bridgeUp(service) {
-    // debugDis('bridgeUp', service);
-    if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
-      try {
-        let bridge = await getAccessoryDump(service);
-        if (bridge) {
-          if (this.initalTimer) {
-            clearTimeout(this.initalTimer);
-            this.initalTimer = setTimeout(this.initalTimerExpire.bind(this), 1000); // Emit Ready 1 second after last update
-          }
-          discovered.push(bridge);
-        }
-      } catch (err) {
-        debugDis('ERROR:', err.message);
+    debugDis('bridgeUp', service);
+
+    if (await this.getServiceDump(service)) {
+      if (this.initalTimer) {
+        clearTimeout(this.initalTimer);
+        this.initalTimer = setTimeout(this.initalTimerExpire.bind(this), 1000); // Emit Ready 1 second after last update
       }
-    } else {
-      debugDump('Filtered HAP instance address: %s -> %s', service.txt.md, service.url);
     }
   }
 
@@ -157,12 +148,38 @@ class HAPNodeJSClient {
    * @param {*} callback 
    */
   async bridgeUpdate(service) {
-    debugDis('bridgeUpdate', this, service);
+    debugDis('bridgeUpdate', service);
+    if (await this.getServiceDump(service)) {
+      this.emit('Update', _deassociateArray(discovered));
+    }
   }
 
   async initalTimerExpire() {
-    debugDis('initalTimerExpire', discovered.length);
-    this.emit('Ready', discovered);
+    debugDis('Ready');
+    debugDis('initalTimerExpire - discovered', Object.keys(discovered).length);
+    this.emit('Ready', _deassociateArray(discovered));
+  }
+
+  /**
+ * 
+ * @param {*} callback 
+ */
+  async getServiceDump(service) {
+    //    debugDis('bridgeUp', service);
+    if ((filter && filter === service.host + ':' + service.port) || !filter) {
+      try {
+        let serviceDump = await getAccessoryDump(service);
+        if (serviceDump) {
+          //          debugDis('discovered', service.deviceID, bridge);
+          discovered[service.deviceID] = serviceDump;
+        }
+        return serviceDump;
+      } catch (err) {
+        debugDis('ERROR:', err.message, service.name);
+      }
+    } else {
+      debugDump('Filtered HAP instance address: %s -> %s', service.txt.md, service.url);
+    }
   }
 
   /**
@@ -192,7 +209,7 @@ class HAPNodeJSClient {
    */
   HAPaccessories(callback) {
     // This is a callback as in the future may need to call something
-    callback(discovered);
+    callback(_deassociateArray(discovered));
   }
   /**
    * HAPNodeJSClient.prototype.mdnsCache
@@ -213,13 +230,13 @@ class HAPNodeJSClient {
    * @param  {type} callback  Callback to execute upon completion of characteristic setting, function(err, response)
    */
   HAPcontrolByDeviceID(deviceID, body, callback) {
-   this._mdnsLookup(deviceID, function (err, instance) {
+    this._mdnsLookup(deviceID, function (err, instance) {
       if (err) {
         callback(err);
       } else {
         HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, body, function (err, response) {
           if (err) {
-            _mdnsError(deviceID);
+            HAPNodeJSClient.prototype._mdnsError(deviceID);
           }
           callback(err, response);
         }, instance);
@@ -283,7 +300,7 @@ class HAPNodeJSClient {
    */
   HAPeventByDeviceID(deviceID, body, callback) {
     // console.log('This-0', this);
-   this._mdnsLookup(deviceID, function (err, instance) {
+    this._mdnsLookup(deviceID, function (err, instance) {
       // debug('This-1', instance);
       if (err) {
         callback(err);
@@ -305,16 +322,16 @@ class HAPNodeJSClient {
           // Response s/b 200 OK
           if (err) {
             debug('Homebridge event reg failed %s:%s', instance.host, instance.port, body, err.message);
-            _mdnsError(deviceID);
+            HAPNodeJSClient.prototype._mdnsError(deviceID);
             callback(err);
           } else if (response.statusCode !== 207 && response.statusCode !== 204) {
             if (response.statusCode === 401 || response.statusCode === 470) {
               debug('Homebridge auth failed, invalid PIN %s', _findPinByKey(deviceID), deviceID, body, err, response.body);
-              _mdnsError(deviceID);
+              HAPNodeJSClient.prototype._mdnsError(deviceID);
               callback(new Error('Homebridge auth failed, invalid PIN ' + _findPinByKey(deviceID)));
             } else {
               debug('Homebridge event reg failed %s:%s Status: %s ', deviceID, response.statusCode, body, err, response.body);
-              _mdnsError(deviceID);
+              HAPNodeJSClient.prototype._mdnsError(deviceID);
               callback(new Error('Homebridge event reg failed'));
             }
           } else {
@@ -414,14 +431,14 @@ class HAPNodeJSClient {
    */
   HAPresourceByDeviceID(deviceID, body, callback) {
     // console.log('This-0', this);
-   this._mdnsLookup(deviceID, function (err, instance) {
+    this._mdnsLookup(deviceID, function (err, instance) {
       // console.log('This-1', this);
       if (err) {
         callback(err);
       } else {
         HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, body, function (err, response) {
           if (err) {
-            _mdnsError(deviceID);
+            HAPNodeJSClient.prototype._mdnsError(deviceID);
           }
           callback(err, response);
         }, instance);
@@ -484,14 +501,14 @@ class HAPNodeJSClient {
    */
   HAPstatusByDeviceID(deviceID, body, callback) {
     // console.log('This-0', this);
-   this._mdnsLookup(deviceID, function (err, instance) {
+    this._mdnsLookup(deviceID, function (err, instance) {
       // console.log('This-1', this);
       if (err) {
         callback(err);
       } else {
         HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, body, function (err, response) {
           if (err) {
-            _mdnsError(deviceID);
+            HAPNodeJSClient.prototype._mdnsError(deviceID);
           }
           callback(err, response);
         }, instance);
@@ -547,6 +564,12 @@ class HAPNodeJSClient {
     });
   }
 
+  /**
+   *  When a 'known' bridge is not found, force refresh the cache for it
+   * 
+   * @param {*} deviceID 
+   * @param {*} callback 
+   */
   async _mdnsLookup(deviceID, callback) {
     // debug('\nmdnsLookup start', serviceName);
     if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
@@ -556,13 +579,23 @@ class HAPNodeJSClient {
       _populateCache(4, null, function () {
         if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
           // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
-  
+
           callback(null, this.monitorBridgeUpdates.mdnsCacheGet(deviceID));
         } else {
           callback(new Error('ERROR: HB Instance not found', deviceID), null);
         }
       });
     }
+  }
+
+  async _mdnsError(deviceID) {
+    debug('_mdnsError ', deviceID, this);
+    this.monitorBridgeUpdates.mdnsCacheRemove(deviceID);
+    _populateCache(4, null, function () {
+      if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
+        // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
+      }
+    });
   }
 
   /**
@@ -578,6 +611,7 @@ class HAPNodeJSClient {
 
 inherits(HAPNodeJSClient, EventEmitter);
 
+/*
 function _discovery() {
   debug('Starting Homebridge instance discovery');
   discovered = [];
@@ -587,18 +621,7 @@ function _discovery() {
     this.emit('Ready', discovered);
   }.bind(this));
 }
-
-
-
-function _mdnsError(deviceID) {
-  // debug('\_mdnsError ', deviceID);
-  this.monitorBridgeUpdates.mdnsCacheRemove(deviceID);
-  _populateCache(4, null, function () {
-    if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
-      // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
-    }
-  });
-}
+*/
 
 
 function _populateCache(timeout, discovery, callback) {
@@ -627,14 +650,14 @@ function _populateCache(timeout, discovery, callback) {
           }
         }
         if (url) {
-          this.monitorBridgeUpdates.mdnsCacheUpdate(result.txt.id) = {
+          this.monitorBridgeUpdates.mdnsCacheUpdate({
             name: result.name,
             host: ipAddress,
             port: result.port,
             url: url,
             deviceID: result.txt.id,
             txt: result.txt
-          };
+          });
           if (discovery) {
             discovery.call(this, this.monitorBridgeUpdates.mdnsCacheGet(result.txt.id), function () { });
           }
@@ -664,11 +687,6 @@ function _findPinByKey(key) {
   key = key.toLowerCase();
   return pins[key] || pins['default'];
 }
-
-
-
-
-
 
 /**
  * _reconnectServer - Reconnect to event server
@@ -757,15 +775,11 @@ function _reconnectServer(server) {
   }
 }
 
-
-
-
-
 module.exports = {
   HAPNodeJSClient: HAPNodeJSClient
 };
 
-
+/*
 function _getAccessories(instance, callback) {
   // debug('_getAccessories()', filter, instance.url + '/accessories');
   if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
@@ -834,6 +848,18 @@ function _getAccessories(instance, callback) {
     debug('Filtered HAP instance address: %s -> %s', instance.txt.md, instance.url);
   }
 }
+*/
+
+function _deassociateArray(original) {
+  var result = [];
+  for (var item in original) {
+    result.push(original[item]);
+  }
+  // console.log('Result', result);
+  return (result);
+}
+
+
 
 /**
  * This checks the instance pin matches
