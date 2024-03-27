@@ -22,7 +22,7 @@
     "axios": "1.6.8",
     "axios-retry": "4.1.0",
     "better-queue": "3.8.12",
-    "bonjour-hap": "3.6.5",
+    "bonjour-hap": "3.7.1",
     "buffer": "6.0.3",
     "debug": "4.3.4",
     "extend": "3.0.2",
