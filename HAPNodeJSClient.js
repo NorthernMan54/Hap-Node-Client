@@ -20,6 +20,7 @@ const MonitorBridgeUpdates = require('./lib/monitorBridgeUpdates').MonitorBridge
 
 var debug = require('debug')('HAPNodeJSClient');
 var debugDis = require('debug')('HAPNodeJSClient:Discover');
+var debugDump = require('debug')('HAPNodeJSClient:Dump');
 
 axiosRetry(axios, { retries: 3 });
 
