@@ -184,7 +184,7 @@ class HAPNodeJSClient {
   }
 
   /**
-   * HAPNodeJSClient.prototype.RegisterPin - Register pin numbers ()
+   * RegisterPin - Register pin numbers ()
    *
    * @class
    * @param  {type} key  Unique identifier of homebridge instance (ip:port or deviceID)
@@ -202,7 +202,7 @@ class HAPNodeJSClient {
     return true;
   }
   /**
-   * HAPNodeJSClient.prototype.HAPaccessories - Returns an array of all homebridge instances, and the accessories for each.
+   * HAPaccessories - Returns an array of all homebridge instances, and the accessories for each.
    *
    * @class
    * @param  {type} callback description
@@ -213,7 +213,7 @@ class HAPNodeJSClient {
     callback(_deassociateArray(discovered));
   }
   /**
-   * HAPNodeJSClient.prototype.mdnsCache
+   * mdnsCache
    *
    * @returns mdnsCacheObject
    */
@@ -224,7 +224,7 @@ class HAPNodeJSClient {
   // curl -X PUT http://127.0.0.1:51826/characteristics --header "Content-Type:Application/json"
   // --header "authorization: 031-45-154" --data "{ \"characteristics\": [{ \"aid\": 2, \"iid\": 9, \"value\": 0}] }"
   /**
-   * HAPNodeJSClient.prototype.HAPcontrolByDeviceID - Send a characteristic PUT Message to a particular homebridge instance
+   * HAPcontrolByDeviceID - Send a characteristic PUT Message to a particular homebridge instance
    *
    * @param  {type} deviceID  deviceID of homebridge instance
    * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
@@ -235,9 +235,9 @@ class HAPNodeJSClient {
       if (err) {
         callback(err);
       } else {
-        HAPNodeJSClient.prototype.HAPcontrol.call(this, instance.host, instance.port, body, function (err, response) {
+        this.HAPcontrol.call(this, instance.host, instance.port, body, function (err, response) {
           if (err) {
-            HAPNodeJSClient.prototype._mdnsError(deviceID);
+            this._mdnsError(deviceID);
           }
           callback(err, response);
         }, instance);
@@ -245,7 +245,7 @@ class HAPNodeJSClient {
     }.bind(this));
   }
   /**
-   * HAPNodeJSClient.prototype.HAPcontrol - Send a characteristic PUT Message to a particular homebridge instance
+   * HAPcontrol - Send a characteristic PUT Message to a particular homebridge instance
    *
    * @param  {type} ipAddress IP Address of homebridge instance
    * @param  {type} port      Port of homebridge instance
@@ -293,7 +293,7 @@ class HAPNodeJSClient {
     });
   }
   /**
-   * HAPNodeJSClient.prototype.HAPeventByDeviceID - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
+   * HAPeventByDeviceID - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
    *
    * @param  {type} deviceID  deviceID homebridge instance
    * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
@@ -321,18 +321,19 @@ class HAPNodeJSClient {
           body: body
         }, function (err, response) {
           // Response s/b 200 OK
+          // debug('HAPeventByDeviceID %s:%s', instance.host, instance.port, response);
           if (err) {
             debug('Homebridge event reg failed %s:%s', instance.host, instance.port, body, err.message);
-            HAPNodeJSClient.prototype._mdnsError(deviceID);
+            this._mdnsError(deviceID);
             callback(err);
           } else if (response.statusCode !== 207 && response.statusCode !== 204) {
             if (response.statusCode === 401 || response.statusCode === 470) {
               debug('Homebridge auth failed, invalid PIN %s', _findPinByKey(deviceID), deviceID, body, err, response.body);
-              HAPNodeJSClient.prototype._mdnsError(deviceID);
+              this._mdnsError(deviceID);
               callback(new Error('Homebridge auth failed, invalid PIN ' + _findPinByKey(deviceID)));
             } else {
               debug('Homebridge event reg failed %s:%s Status: %s ', deviceID, response.statusCode, body, err, response.body);
-              HAPNodeJSClient.prototype._mdnsError(deviceID);
+              this._mdnsError(deviceID);
               callback(new Error('Homebridge event reg failed'));
             }
           } else {
@@ -364,7 +365,7 @@ class HAPNodeJSClient {
     }.bind(this));
   }
   /**
-   * HAPNodeJSClient.prototype.HAPevent - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
+   * HAPevent - Send a characteristic PUT Message to a particular homebridge instance, this maintains a socket connection for use in returning Events
    *
    * @param  {type} ipAddress IP Address of homebridge instance
    * @param  {type} port      Port of homebridge instance
@@ -424,7 +425,7 @@ class HAPNodeJSClient {
     }.bind(this));
   }
   /**
-   * HAPNodeJSClient.prototype.HAPresourceByDeviceID - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
+   * HAPresourceByDeviceID - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
    *
    * @param  {type} DeviceID  DeviceID of homebridge instance
    * @param  {type} body      An array of HomeKit characteristic updates, [{ \"aid\": 2, \"iid\": 9, \"value\": 0}]
@@ -437,9 +438,9 @@ class HAPNodeJSClient {
       if (err) {
         callback(err);
       } else {
-        HAPNodeJSClient.prototype.HAPresource.call(this, instance.host, instance.port, body, function (err, response) {
+        this.HAPresource.call(this, instance.host, instance.port, body, function (err, response) {
           if (err) {
-            HAPNodeJSClient.prototype._mdnsError(deviceID);
+            this._mdnsError(deviceID);
           }
           callback(err, response);
         }, instance);
@@ -447,7 +448,7 @@ class HAPNodeJSClient {
     }.bind(this));
   }
   /**
-   * HAPNodeJSClient.prototype.HAPresource - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
+   * HAPresource - Send a characteristic PUT Message to a particular homebridge instance using resource interface, ie camera
    *
    * @param  {type} ipAddress IP Address of homebridge instance
    * @param  {type} port      Port of homebridge instance
@@ -494,7 +495,7 @@ class HAPNodeJSClient {
     });
   }
   /**
-   * HAPNodeJSClient.prototype.HAPstatusByDeviceID - Get current status for characteristics
+   * HAPstatusByDeviceID - Get current status for characteristics
    *
    * @param  {type} deviceID  deviceID of homebridge instance
    * @param  {type} body      description
@@ -507,9 +508,9 @@ class HAPNodeJSClient {
       if (err) {
         callback(err);
       } else {
-        HAPNodeJSClient.prototype.HAPstatus.call(this, instance.host, instance.port, body, function (err, response) {
+        this.HAPstatus.call(this, instance.host, instance.port, body, function (err, response) {
           if (err) {
-            HAPNodeJSClient.prototype._mdnsError(deviceID);
+            this._mdnsError(deviceID);
           }
           callback(err, response);
         }, instance);
@@ -517,7 +518,7 @@ class HAPNodeJSClient {
     }.bind(this));
   }
   /**
-   * HAPNodeJSClient.prototype.HAPstatus - Get current status for characteristics
+   * HAPstatus - Get current status for characteristics
    *
    * @param  {type} ipAddress IP Address of homebridge instance
    * @param  {type} port      Port of homebridge instance
@@ -577,7 +578,7 @@ class HAPNodeJSClient {
       // debug('cached', this.monitorBridgeUpdates.mdnsCacheGet(serviceName].url);
       callback(null, this.monitorBridgeUpdates.mdnsCacheGet(deviceID));
     } else {
-      _populateCache(4, null, function () {
+      _populateCache(4, null, () => {
         if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
           // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
 
@@ -590,9 +591,9 @@ class HAPNodeJSClient {
   }
 
   async _mdnsError(deviceID) {
-    debug('_mdnsError ', deviceID, this);
+    // debug('_mdnsError ', deviceID);
     this.monitorBridgeUpdates.mdnsCacheRemove(deviceID);
-    _populateCache(4, null, function () {
+    _populateCache(4, null, () => {
       if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
         // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
       }
@@ -697,17 +698,19 @@ function _findPinByKey(key) {
  */
 
 function _reconnectServer(server) {
-  debug('HAPevent events Reregister', server);
+  debug('HAPevent events Reregister', server, this.eventRegistry);
   // debug('This', this, server);
   var events = [];
-  this.eventRegistry[server.deviceID].forEach(function (device) {
-    events.push({
-      deviceID: server.deviceID,
-      aid: device.aid,
-      iid: device.iid,
-      status: -70402
+  if (this.eventRegistry.length) {
+    this.eventRegistry[server.deviceID].forEach(function (device) {
+      events.push({
+        deviceID: server.deviceID,
+        aid: device.aid,
+        iid: device.iid,
+        status: -70402
+      });
     });
-  });
+  }
   this.emit('hapEvent', events);
   // this.emit(events[0].host + events[0].port + events[0].aid, events);
   events.forEach(function (event) {
@@ -739,14 +742,16 @@ function _reconnectServer(server) {
        * [{"host":"192.168.1.13","port":43787,"deviceID":"76:59:CE:25:B9:6E","aid":1,"iid":13,"value":true,"status":true}]
        */
       debug('clearTimer', server, this.eventRegistry[server.deviceID]);
-      this.eventRegistry[server.deviceID].forEach(function (device) {
-        events.push({
-          deviceID: server.deviceID,
-          aid: device.aid,
-          iid: device.iid,
-          status: -70402
+      if (this.eventRegistry.length) {
+        this.eventRegistry[server.deviceID].forEach(function (device) {
+          events.push({
+            deviceID: server.deviceID,
+            aid: device.aid,
+            iid: device.iid,
+            status: -70402
+          });
         });
-      });
+      }
       this.emit('hapEvent', events);
       // this.emit(events[0].host + events[0].port + events[0].aid, events);
       events.forEach(function (event) {
@@ -756,14 +761,16 @@ function _reconnectServer(server) {
       }.bind(this));
     } else {
       debug('HAPevent event reregister succeeded', server);
-      this.eventRegistry[server.deviceID].forEach(function (device) {
-        events.push({
-          deviceID: server.deviceID,
-          aid: device.aid,
-          iid: device.iid,
-          status: true
+      if (this.eventRegistry.length) {
+        this.eventRegistry[server.deviceID].forEach(function (device) {
+          events.push({
+            deviceID: server.deviceID,
+            aid: device.aid,
+            iid: device.iid,
+            status: true
+          });
         });
-      });
+      }
       this.emit('hapEvent', events);
       // this.emit(events[0].host + events[0].port + events[0].aid, events);
       events.forEach(function (event) {
