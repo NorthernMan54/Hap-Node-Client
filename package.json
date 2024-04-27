@@ -35,7 +35,7 @@
     "watch": [],
     "ext": "js",
     "ignore": [],
-    "exec": "jest --detectOpenHandles",
+    "exec": "DEBUG=HAPNodeJSClient* jest --detectOpenHandles",
     "signal": "SIGTERM",
     "env": {
       "NODE_OPTIONS": "--trace-warnings"

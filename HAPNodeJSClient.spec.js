@@ -105,7 +105,7 @@ describe("Correct PIN", () => {
     test("valid deviceID, but invalid body", done => {
 
       homebridges.HAPstatusByDeviceID(testDeviceID, "{ a: 1 }", function (err, response) {
-        // console.log("HAPstatusByDeviceID", err.message, response);
+        console.log("HAPstatusByDeviceID", err.message, response);
         expect(err.message).toEqual('Homebridge Status failed');
         expect(response).toBeUndefined();
         done();
@@ -121,9 +121,9 @@ describe("Correct PIN", () => {
 
   describe("HAPcontrolByDeviceID", () => {
     test("valid deviceID, and valid body On", done => {
-
+      console.log("HAPcontrolByDeviceID - start");
       homebridges.HAPcontrolByDeviceID(testDeviceID, testAccessoryControlOn, function (err, response) {
-        // console.log("HAPcontrolByDeviceID", err, response);
+        console.log("HAPcontrolByDeviceID", err, response);
         expect(err).toBeNull();
         expect(response).toBeNull();
         done();

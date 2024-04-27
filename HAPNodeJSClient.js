@@ -81,12 +81,11 @@ class HAPNodeJSClient {
 
     this.monitorBridgeUpdates.on('up', this.bridgeUp.bind(this));
     this.monitorBridgeUpdates.on('update', this.bridgeUpdate.bind(this));
+    this.monitorBridgeUpdates.on('Ready', this.bridgeReady.bind(this));
 
     // _discovery.call(this);  // Inital discovery of devices
     this._eventBus = new EventEmitter();
     // this.discoveryTimer = setInterval(_discovery.bind(this), this.refresh * 1000);
-
-    this.initalTimer = setTimeout(this.initalTimerExpire.bind(this), 2000);
 
     /**
      * HomeKit Accessory Characteristic event pass thru
@@ -134,13 +133,8 @@ class HAPNodeJSClient {
    * @param {*} callback 
    */
   async bridgeUp(service) {
-    debugDis('bridgeUp', service);
-
+    // debugDis('bridgeUp', service);
     if (await this.getServiceDump(service)) {
-      if (this.initalTimer) {
-        clearTimeout(this.initalTimer);
-        this.initalTimer = setTimeout(this.initalTimerExpire.bind(this), 1000); // Emit Ready 1 second after last update
-      }
     }
   }
 
@@ -155,18 +149,23 @@ class HAPNodeJSClient {
     }
   }
 
-  async initalTimerExpire() {
-    debugDis('Ready');
-    debugDis('initalTimerExpire - discovered', Object.keys(discovered).length);
-    this.emit('Ready', _deassociateArray(discovered));
-  }
+    /**
+   * 
+   * @param {*} callback 
+   */
+    async bridgeReady(service) {
+      debugDis('bridgeReady %d Homebridge instances', Object.keys(discovered).length);
+      if (Object.keys(discovered).length > 0) {
+        this.emit('Ready', _deassociateArray(discovered));
+      }
+    }
 
   /**
  * 
  * @param {*} callback 
  */
   async getServiceDump(service) {
-    //    debugDis('bridgeUp', service);
+    // debugDis('getServiceDump', service);
     if ((filter && filter === service.host + ':' + service.port) || !filter) {
       try {
         let serviceDump = await getAccessoryDump(service);
@@ -443,7 +442,7 @@ class HAPNodeJSClient {
             this._mdnsError(deviceID);
           }
           callback(err, response);
-        }, instance);
+        }.bind(this), instance);
       }
     }.bind(this));
   }
@@ -513,7 +512,7 @@ class HAPNodeJSClient {
             this._mdnsError(deviceID);
           }
           callback(err, response);
-        }, instance);
+        }.bind(this), instance);
       }
     }.bind(this));
   }
@@ -567,7 +566,7 @@ class HAPNodeJSClient {
   }
 
   /**
-   *  When a 'known' bridge is not found, force refresh the cache for it
+   *  When a 'known' bridge is not found, force refresh the cache
    * 
    * @param {*} deviceID 
    * @param {*} callback 
@@ -578,26 +577,21 @@ class HAPNodeJSClient {
       // debug('cached', this.monitorBridgeUpdates.mdnsCacheGet(serviceName].url);
       callback(null, this.monitorBridgeUpdates.mdnsCacheGet(deviceID));
     } else {
-      _populateCache(4, null, () => {
-        if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
-          // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
-
-          callback(null, this.monitorBridgeUpdates.mdnsCacheGet(deviceID));
-        } else {
-          callback(new Error('ERROR: HB Instance not found', deviceID), null);
-        }
-      });
-    }
+      debug('_mdnsLookup missing', deviceID);
+      await this.monitorBridgeUpdates.refreshCache();
+      if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
+        // debug('cached', this.monitorBridgeUpdates.mdnsCacheGet(serviceName].url);
+        callback(null, this.monitorBridgeUpdates.mdnsCacheGet(deviceID));
+      } else {
+        callback(new Error('ERROR: HB Instance not found', deviceID), null);
+      }
+    };
   }
 
   async _mdnsError(deviceID) {
-    // debug('_mdnsError ', deviceID);
+    debug('_mdnsError ', deviceID);
     this.monitorBridgeUpdates.mdnsCacheRemove(deviceID);
-    _populateCache(4, null, () => {
-      if (this.monitorBridgeUpdates.mdnsCacheGet(deviceID)) {
-        // debug('refreshed', this.monitorBridgeUpdates.mdnsCacheGet(deviceID]);
-      }
-    });
+    this.monitorBridgeUpdates.refreshCache();
   }
 
   /**
@@ -625,9 +619,9 @@ function _discovery() {
 }
 */
 
-
+/*
 function _populateCache(timeout, discovery, callback) {
-  // debug('_populateCache', populateCache);
+  debug('_populateCache', populateCache);
   if (!populateCache) {
     populateCache = true;
     // debug('_populateCache', new Error().stack);
@@ -679,7 +673,7 @@ function _populateCache(timeout, discovery, callback) {
   } else {
     callback();
   }
-}
+}*/
 
 function _findPinByKey(key) {
   if (!key) {
