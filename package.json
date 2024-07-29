@@ -24,7 +24,7 @@
     "better-queue": "3.8.12",
     "bonjour-hap": "3.6.5",
     "buffer": "6.0.3",
-    "debug": "4.3.4",
+    "debug": "4.3.6",
     "extend": "3.0.2",
     "ip": "2.0.1",
     "once": "1.4.0"
