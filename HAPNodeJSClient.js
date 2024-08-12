@@ -719,8 +719,8 @@ HAPNodeJSClient.prototype.HAPstatus = function (ipAddress, port, body, callback,
 };
 
 function _getAccessories(instance, callback) {
-  // debug('_getAccessories()', filter, instance.url + '/accessories');
-  if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
+  // console.log('_getAccessories()', filter, instance.host + ':' + instance.port, filter.includes(instance.host + ':' + instance.port));
+  if ((filter && filter.includes(instance.host + ':' + instance.port)) || !filter) {
     var host = instance.host + ':' + instance.port;
 
     axios({
