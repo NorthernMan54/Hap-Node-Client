@@ -15,9 +15,11 @@ axiosRetry(axios, { retries: 3 });
 var discovered = [];
 var mdnsCache = {};
 var populateCache = false;
+var populateCacheTimeout;
 
 var filter = false;
 var pins = {};
+var type = 'hap';
 
 module.exports = {
   HAPNodeJSClient: HAPNodeJSClient
@@ -47,6 +49,7 @@ function HAPNodeJSClient(options) {
   this.timeout = options.timeout || 20;
   this.reqTimeout = options.reqTimeout || 7000;
   this.RegisterPin('default', options.pin || '031-45-154');
+  type = options.type || 'hap';
   filter = options.filter || false;
   if (this.debug) {
     let debugEnable = require('debug');
@@ -65,7 +68,7 @@ function HAPNodeJSClient(options) {
   this.eventRegistry = {};
   _discovery.call(this);
   this._eventBus = new EventEmitter();
-  setInterval(_discovery.bind(this), this.refresh * 1000);
+  this.discoveryTimer = setInterval(_discovery.bind(this), this.refresh * 1000);
 
   /**
    * HomeKit Accessory Characteristic event pass thru
@@ -154,7 +157,7 @@ function _populateCache(timeout, discovery, callback) {
     populateCache = true;
     // debug('_populateCache', new Error().stack);
     var browser = bonjour.find({
-      type: 'hap'
+      type: (type ? type : 'hap')
     }, function (result) {
       if (result.txt) {
         debug('HAP Device discovered', result.name, result.addresses);
@@ -192,7 +195,7 @@ function _populateCache(timeout, discovery, callback) {
         debug('Unsupported device found, skipping', result.name);
       }
     });
-    setTimeout(function () {
+    populateCacheTimeout = setTimeout(function () {
       // debug('Timeout:');
       browser.stop();
       populateCache = false;
@@ -211,6 +214,16 @@ function _findPinByKey(key) {
   key = key.toLowerCase();
   return pins[key] || pins['default'];
 }
+
+  /**
+   * Destroy and shutdown HAPNodeJSClient - Used by testing
+   */
+  HAPNodeJSClient.prototype.destroy = function() {
+    clearInterval(this.discoveryTimer);
+    clearInterval(populateCacheTimeout);
+    bonjour.destroy();
+    // this.monitorBridgeUpdates.destroy();
+  }
 
 /**
  * HAPNodeJSClient.prototype.RegisterPin - Register pin numbers ()
@@ -706,8 +719,8 @@ HAPNodeJSClient.prototype.HAPstatus = function (ipAddress, port, body, callback,
 };
 
 function _getAccessories(instance, callback) {
-  // debug('_getAccessories()', filter, instance.url + '/accessories');
-  if ((filter && filter === instance.host + ':' + instance.port) || !filter) {
+  // console.log('_getAccessories()', filter, instance.host + ':' + instance.port, filter.includes(instance.host + ':' + instance.port));
+  if ((filter && filter.includes(instance.host + ':' + instance.port)) || !filter) {
     var host = instance.host + ':' + instance.port;
 
     axios({

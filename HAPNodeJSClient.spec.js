@@ -311,3 +311,90 @@ describe("Incorrect PIN", () => {
     });
   });
 });
+
+
+describe.only("Filter", () => {
+
+  describe("Filter None", () => {
+
+    let homebridges;
+
+    beforeAll(() => {
+      var options = {
+      };
+      homebridges = new HAPNodeJSClient(options);
+    });
+
+    describe("Discover Accessories", () => {
+      test("Retrieve Accessories", done => {
+        console.log('This takes 20 seconds');
+        homebridges.on('Ready', function () {
+
+          homebridges.HAPaccessories(function (endPoints) {
+            // console.log("alexaDiscovery Single", endPoints, endPoints.length);
+            // console.log("Test Endpoint", JSON.stringify(endPoints.find(endpoint => endpoint.deviceID === testDeviceID).accessories, null, 2));
+            expect(endPoints.length).toBeGreaterThan(2);
+            done();
+          });
+        });
+      }, 21000);
+    });
+
+  });
+
+  describe("Filter Single", () => {
+
+    let homebridges;
+
+    beforeAll(() => {
+      var options = {
+        filter: "192.168.1.11:51551"
+      };
+      homebridges = new HAPNodeJSClient(options);
+    });
+
+    describe("Discover Accessories", () => {
+      test("Retrieve Accessories", done => {
+        console.log('This takes 20 seconds');
+        homebridges.on('Ready', function () {
+
+          homebridges.HAPaccessories(function (endPoints) {
+            // console.log("alexaDiscovery Single", endPoints, endPoints.length);
+            // console.log("Test Endpoint", JSON.stringify(endPoints.find(endpoint => endpoint.deviceID === testDeviceID).accessories, null, 2));
+            expect(endPoints.length).toEqual(1);
+            done();
+          });
+        });
+      }, 21000);
+    });
+
+  });
+
+  describe("Filter Dual", () => {
+
+    let homebridges;
+
+    beforeAll(() => {
+      var options = {
+        filter: "192.168.1.11:51551, 192.168.1.11:46047"
+      };
+      homebridges = new HAPNodeJSClient(options);
+    });
+
+    describe("Discover Accessories", () => {
+      test("Retrieve Accessories", done => {
+        console.log('This takes 20 seconds');
+        homebridges.on('Ready', function () {
+
+          homebridges.HAPaccessories(function (endPoints) {
+            // console.log("alexaDiscovery Dual", endPoints, endPoints.length);
+            // console.log("Test Endpoint", JSON.stringify(endPoints.find(endpoint => endpoint.deviceID === testDeviceID).accessories, null, 2));
+            expect(endPoints.length).toEqual(2);
+            done();
+          });
+        });
+      }, 21000);
+    });
+
+  });
+});
