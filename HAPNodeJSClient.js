@@ -133,11 +133,19 @@ function _mdnsLookup(deviceID, callback) {
       if (mdnsCache[deviceID]) {
         // debug('refreshed', mdnsCache[deviceID]);
 
+        var pin = _findPinByKey(deviceID);
+        var host = mdnsCache[deviceID].host + ':' + mdnsCache[deviceID].port;
+        try {
+          this.RegisterPin(host, pin);
+        } catch (err) {
+          debug('Hap-Node-Client missing "this" reference line 134', err.message);
+        }
+
         callback(null, mdnsCache[deviceID]);
       } else {
         callback(new Error('ERROR: HB Instance not found', deviceID), null);
       }
-    });
+    }.bind(this));
   }
 }
 
@@ -148,7 +156,7 @@ function _mdnsError(deviceID) {
     if (mdnsCache[deviceID]) {
       // debug('refreshed', mdnsCache[deviceID]);
     }
-  });
+  }.bind(this));
 }
 
 function _populateCache(timeout, discovery, callback) {
@@ -200,7 +208,7 @@ function _populateCache(timeout, discovery, callback) {
       browser.stop();
       populateCache = false;
       callback();
-    }, timeout * 1000);
+    }.bind(this), timeout * 1000);
   } else {
     callback();
   }
