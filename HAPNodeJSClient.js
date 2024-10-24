@@ -7,7 +7,7 @@ const axiosRetry = require('axios-retry').default;
 var inherits = require('util').inherits;
 var debug = require('debug')('hapNodeJSClient');
 var bonjour = require('bonjour-hap')();
-var ip = require('ip');
+var ip = require('neoip');
 var normalizeUUID = require('./lib/util.js').normalizeUUID;
 
 axiosRetry(axios, { retries: 3 });

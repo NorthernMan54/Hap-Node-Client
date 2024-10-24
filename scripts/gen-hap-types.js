@@ -40,7 +40,7 @@ for (var _c = 0, _d = Object.entries(hap_nodejs_1.Characteristic); _c < _d.lengt
 	this.getDefaultValue = function () {
         }
 
-       var obj = func.call(this);
+       var obj = new func();
 //        console.log('D -> %s: %s', value.UUID, obj.displayName);
 //        Characteristics.push("    '" + value.UUID + "': '" + name_2 + "',");
         Characteristics.push("    '" + value.UUID + "': '" + obj.displayName + "',");
